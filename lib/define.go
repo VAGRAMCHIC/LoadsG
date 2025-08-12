@@ -14,21 +14,16 @@ const (
 )
 
 type HttpHead struct {
-	method        _httpMethod
-	url           string
-	proto_version string
-	length        int
-	headers       map[string]string
-}
-
-type LoadRrequest struct {
-	Id      string `json:"id" binding:"required"`
-	Amount  int    `json:"amount" binding:"required"`
-	Request string `json:"request" binding:"required"`
+	Method       _httpMethod       `json:"method"`
+	URL          string            `json:"url"`
+	ProtoVersion string            `json:"proto_version"`
+	Length       int               `json:"length"`
+	Headers      map[string]string `json:"headers"`
 }
 
 type HTTPLoadRequest struct {
 	Id       int      `json:"id" binding:"required"`
 	HttpHead HttpHead `json:"httpHead" binding:"required"`
 	Body     string   `json:"body" binding:"required"`
+	Count    int      `json:"count" binding:"required"`
 }

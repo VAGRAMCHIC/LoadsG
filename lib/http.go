@@ -42,25 +42,25 @@ func CreateHttpHead(mt _httpMethod, url_path string, proto_version string, heade
 	var request string
 	var head HttpHead
 
-	head.method = mt
-	if head.method.IsValid() != true {
+	head.Method = mt
+	if head.Method.IsValid() != true {
 		panic("invalid_method")
 	}
-	head.url = url_path
-	head.proto_version = proto_version
-	head.length = 0
-	head.headers = headers
-	request += fmt.Sprintf("%s %s %s \n", head.method, head.url, head.proto_version)
+	head.URL = url_path
+	head.ProtoVersion = proto_version
+	head.Length = 0
+	head.Headers = headers
+	request += fmt.Sprintf("%s %s %s \n", head.Method, head.URL, head.ProtoVersion)
 
 	return head
 }
 
 func BuildHttpRequest(head_data HttpHead, body string) (string, string) {
-	request := fmt.Sprintf("%s %s HTTP/1.1\r\n", head_data.method, head_data.url)
-	_, host, _, _ := parseRequestLine(head_data.url)
+	request := fmt.Sprintf("%s %s HTTP/1.1\r\n", head_data.Method, head_data.URL)
+	_, host, _, _ := parseRequestLine(head_data.URL)
 	request += fmt.Sprintf("Host: %s\r\n", host)
 
-	for k, v := range head_data.headers {
+	for k, v := range head_data.Headers {
 		request += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 

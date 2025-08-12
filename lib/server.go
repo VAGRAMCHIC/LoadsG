@@ -1,10 +1,8 @@
 package lib
 
 import (
-	"log"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -82,75 +80,23 @@ func Server(jwtKey []byte) {
 			user, _ := c.Get("username")
 			c.JSON(http.StatusOK, gin.H{"user": user})
 		})
-		auth.POST("/load", func(c *gin.Context) {
-			var loadRequest LoadRrequest
-
-			headers := map[string]string{
-				"Content-Type": "application/x-www-form-urlencoded",
-				"User-Agent":   "LoadsG/1.0",
-			}
-			var httpLoadRequest HTTPLoadRequest
-			httpLoadRequest.Id = 0
-			httpLoadRequest.HttpHead = CreateHttpHead("GET", "http://test.customlabs.ru/test2/", "HTTP/1.1", headers)
-			httpLoadRequest.Body = "test"
-
-			if err := c.ShouldBindBodyWithJSON(&loadRequest); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request data"})
+		auth.POST("/load/http", func(c *gin.Context) {
+			var loadRequest HTTPLoadRequest
+			if err := c.BindJSON(&loadRequest); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
-			log.Print(loadRequest)
-			request, host := BuildHttpRequest(httpLoadRequest.HttpHead, httpLoadRequest.Body)
-
-			requests := make([]string, loadRequest.Amount)
-			for i := range loadRequest.Amount {
-				requests[i] = request
-			}
-			var wg sync.WaitGroup
-			for _, req := range requests {
-				wg.Add(1)
-				go func(r string) {
-					defer wg.Done()
-					SendHttpRequest(r, host)
-					log.Print(r, host)
-				}(req)
-			}
-			user, _ := c.Get("username")
+			result, _ := RunLoad(loadRequest)
 			c.JSON(http.StatusOK, gin.H{
-				"user":          user,
 				"status":        "ok",
-				"sent_requests": loadRequest.Amount,
+				"sent_requests": result,
 			})
-
 		})
 	}
 
 	r.Run(":8080")
 }
 
-/*
-	func JWTAuthMiddleware() gin.HandlerFunc {
-		return func(c *gin.Context) {
-			tokenString := c.GetHeader("Authorization")
-			if tokenString == "" {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
-				return
-			}
-
-			claims := &Claims{}
-			token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-				return jwtKey, nil
-			})
-			fmt.Print(token, err)
-			if err != nil || !token.Valid {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-				return
-			}
-
-			c.Set("username", claims.Username)
-			c.Next()
-		}
-	}
-*/
 func JWTAuthMiddleware(jwtKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
