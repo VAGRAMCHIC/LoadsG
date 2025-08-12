@@ -78,34 +78,33 @@ func BuildHttpRequest(head_data HttpHead, body string) (string, string) {
 
 }
 
-func SendHttpRequest(request string, dialHost string) string {
-	if !strings.Contains(dialHost, ":") {
-		dialHost = dialHost + ":80"
+func SendHttpRequest(request string, host string) (int, error) {
+	if !strings.Contains(host, ":") {
+		host = host + ":80"
 	}
-
-	conn, err := net.Dial("tcp", dialHost)
+	conn, err := net.Dial("tcp", host)
 	if err != nil {
-		fmt.Println("dial err:", err)
-		return err.Error()
+		return 0, err
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(request))
 	if err != nil {
-		fmt.Println("write err:", err)
-		return err.Error()
+		return 0, err
 	}
 
 	reader := bufio.NewReader(conn)
-	for {
-		line, e := reader.ReadString('\n')
-		if e != nil {
-			break
-		}
-		fmt.Print(line)
+	statusLine, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
 	}
 
-	return ""
+	var proto string
+	var statusCode int
+	var statusText string
+	fmt.Sscanf(statusLine, "%s %d %s", &proto, &statusCode, &statusText)
+
+	return statusCode, nil
 }
 
 func createHandleRespose() string {

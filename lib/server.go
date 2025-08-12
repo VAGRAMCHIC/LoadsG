@@ -86,10 +86,11 @@ func Server(jwtKey []byte) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
-			result, _ := RunLoad(loadRequest)
+			statusCodes, loadDuration, rps, _ := RunLoad(loadRequest)
 			c.JSON(http.StatusOK, gin.H{
-				"status":        "ok",
-				"sent_requests": result,
+				"loadDuration": loadDuration,
+				"statusCodes":  statusCodes,
+				"rps":          rps,
 			})
 		})
 	}
