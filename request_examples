@@ -1,0 +1,26 @@
+curl -X POST "http://localhost:8080/api/load/http" \
+  -H "Content-Type: application/json"  -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNzU0OTg3OTI5fQ.WUv2_4u0DMyRe1DSkIx8Cz9oawNnY33L7M4Wvowv4_A" \
+  -d '{
+    "id": 1,
+    "httpHead": {
+      "method": "GET",
+      "url": "http://test.customlabs.ru/",
+      "proto_version": "HTTP/1.1",
+      "length": 4,
+      "headers": {
+        "Content-Type": "application/json",
+        "User-Agent": "LoadsG/0.1"
+      }
+    },
+    "body": "test",
+    "count": 10
+  }'
+{"sent_requests":"10","status":"ok"}%
+
+curl -X POST http://localhost:8080/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"1234"}'
+
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"1234"}'
