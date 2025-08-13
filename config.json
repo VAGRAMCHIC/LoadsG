@@ -1,5 +1,7 @@
 {
   "id": "test_id",
   "key": "test_key",
-  "jwtKey": "OoGael1eiVeighoo3eighoh9ze8mewosvveER"
+  "jwtKey": "OoGael1eiVeighoo3eighoh9ze8mewosvveER",
+  "maxConcurrent": 10,
+  "pgConn": "postgres://testuser:testpassword@localhost:5432/loadsg"
 }

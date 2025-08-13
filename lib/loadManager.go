@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func RunLoad(load HTTPLoadRequest) (map[int]int, float64, float64, error) {
+func RunLoad(load HTTPLoadRequest, mc int) (map[int]int, float64, float64, error) {
 	request, host := BuildHttpRequest(load.HttpHead, load.Body)
 	requests := make([]string, load.Count)
 
@@ -16,9 +16,9 @@ func RunLoad(load HTTPLoadRequest) (map[int]int, float64, float64, error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var errorCount int
-	statusCodes := make(map[int]int) // счетчик кодов ответа
+	statusCodes := make(map[int]int)
 
-	const maxConcurrent = 10
+	maxConcurrent := mc
 	sem := make(chan struct{}, maxConcurrent)
 	start := time.Now()
 	for _, req := range requests {

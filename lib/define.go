@@ -27,3 +27,8 @@ type HTTPLoadRequest struct {
 	Body     string   `json:"body" binding:"required"`
 	Count    int      `json:"count" binding:"required"`
 }
+
+type User struct {
+	UserName string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}

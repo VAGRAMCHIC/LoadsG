@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  loadsg:
+    build: .
+    container_name: loader
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: testuser
+      DB_PASSWORD: testpassword
+      DB_NAME: loadsg
+      PG_CONN: postgres://testuser:testpassword@localhost:5432/loadsg
+      MAX_CONCURRENT: 10
+      JWT_KEY: OoGael1eiVeighoo3eighoh9ze8mewosvveER
+      KEY: test_key
+      ID: test_id
+    restart: unless-stopped
+
+  db:
+    image: postgres:17
+    container_name: postgres17
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: loadsg
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

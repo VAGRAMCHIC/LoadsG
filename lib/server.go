@@ -19,7 +19,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func Server(jwtKey []byte) {
+func Server(jwtKey []byte, maxConcurrent int) {
 	r := gin.Default()
 
 	// Регистрация нового пользователя
@@ -86,7 +86,7 @@ func Server(jwtKey []byte) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
-			statusCodes, loadDuration, rps, _ := RunLoad(loadRequest)
+			statusCodes, loadDuration, rps, _ := RunLoad(loadRequest, maxConcurrent)
 			c.JSON(http.StatusOK, gin.H{
 				"loadDuration": loadDuration,
 				"statusCodes":  statusCodes,
