@@ -32,3 +32,10 @@ type User struct {
 	UserName string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type Report struct {
+	LoadDuration float64           `json:"loadDuration" binding:"required"`
+	RPS          float64           `json:"rps" binding:"required"`
+	StatusCodes  map[int]int       `json:"statusCodes" binding:"required"`
+	Errors       map[string]string `json:"statusCodes" binding:"required"`
+}

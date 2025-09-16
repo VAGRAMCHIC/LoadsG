@@ -86,7 +86,8 @@ func Server(jwtKey []byte, maxConcurrent int) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 			}
-			statusCodes, loadDuration, rps, _ := RunLoad(loadRequest, maxConcurrent)
+			reportURL := "http://test.customlabs.ru/"
+			statusCodes, loadDuration, rps, _ := RunLoad(loadRequest, maxConcurrent, reportURL)
 			c.JSON(http.StatusOK, gin.H{
 				"loadDuration": loadDuration,
 				"statusCodes":  statusCodes,

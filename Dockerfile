@@ -3,8 +3,11 @@ FROM golang:1.23.10-alpine AS build
 RUN apk add --no-cache git
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod init loadsg
+RUN go mod tidy
+RUN go get github.com/gin-gonic/gin
+RUN go get github.com/golang-jwt/jwt/v5
+RUN go get github.com/jackc/pgx/v5
 COPY . .
 
 RUN go build -o app .
