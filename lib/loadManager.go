@@ -63,9 +63,7 @@ func RunLoad(load HTTPLoadRequest, mc int, endpoint string) (map[int]int, float6
 		go func(r string) {
 			defer wg.Done()
 			defer func() { <-sem }()
-
 			code, err := SendHttpRequest(r, host)
-
 			mu.Lock()
 			if err != nil {
 				errorCount++
