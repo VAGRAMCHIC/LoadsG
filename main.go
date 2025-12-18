@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"loadsg/lib"
 	"loadsg/utils"
@@ -30,6 +29,11 @@ func main() {
 		fmt.Println("Ошибка инициализации базы данных:", db_status)
 		return
 	}
+	user:= lib.User{
+		Id: config.Id,
+		Password: config.Key,
+	}
+	lib.InsertUser(conn, user)
 
 	lib.Server([]byte(config.JwtKey), config.MaxConcurrent, conn)
 

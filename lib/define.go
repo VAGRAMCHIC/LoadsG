@@ -38,8 +38,7 @@ type HTTPLoadRequest struct {
 }
 
 type User struct {
-	Id       int
-	Username string `json:"username" binding:"required"`
+	Id       string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 

@@ -10,14 +10,14 @@ import (
 )
 
 func InitDB(conn *pgx.Conn) (bool, error) {
-	code, err := initTable(*conn, DB_TABLE_USERS)
+	code, err := initTable(conn, DB_TABLE_USERS)
 	if err != nil {
 		return code, err
 	}
 	return code, err
 }
 
-func initTable(conn pgx.Conn, table DB_TABLE) (bool, error) {
+func initTable(conn *pgx.Conn, table DB_TABLE) (bool, error) {
 	var init_table_line string
 
 	var keys []string
@@ -52,17 +52,17 @@ func initTable(conn pgx.Conn, table DB_TABLE) (bool, error) {
 
 
 
-func Connect(pgConn string) pgx.Conn {
+func Connect(pgConn string) *pgx.Conn {
 	conn, err := pgx.Connect(context.Background(), pgConn)
 	if err != nil {
 		log.Printf("cant create connection: %s", err.Error())
 	}
-	return *conn
+	return conn
 }
 
-func InsertUser(conn pgx.Conn, user User) {
+func InsertUser(conn *pgx.Conn, user User) {
 	_, err := conn.Exec(context.Background(),
-		"INSERT INTO users (username, password) VALUES ($1, $2)", user.Username, user.Password)
+		"INSERT INTO users (username, password) VALUES ($1, $2)", user.Id, user.Password)
 	if err != nil {
 		log.Fatalf("Insert data error: %s", err.Error())
 		defer conn.Close(context.Background())
@@ -70,9 +70,9 @@ func InsertUser(conn pgx.Conn, user User) {
 	defer conn.Close(context.Background())
 }
 
-func GetUser(conn pgx.Conn, username string) (User, error) {
+func GetUser(conn *pgx.Conn, username string) (User, error) {
 	var user User
-	err := conn.QueryRow(context.Background(), "SELECT * FROM users where username=$1", username).Scan(&user.Username, &user.Password)
+	err := conn.QueryRow(context.Background(), "SELECT * FROM users where username=$1", username).Scan(&user.Id, &user.Password)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			// Пользователь не найден
