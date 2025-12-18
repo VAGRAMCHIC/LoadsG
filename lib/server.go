@@ -13,7 +13,7 @@ import (
 
 // Claims описывает содержимое токена
 type Claims struct {
-	Username string `json:"username"`
+	Id string `json:"username"`
 	jwt.RegisteredClaims
 }
 
@@ -43,7 +43,7 @@ func Server(jwtKey []byte, maxConcurrent int, pgConn *pgx.Conn) {
 		// Генерируем токен
 		expirationTime := time.Now().Add(1 * time.Hour)
 		claims := &Claims{
-			Username: creds.Id,
+			Id: creds.Id,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(expirationTime),
 			},
@@ -110,7 +110,7 @@ func JWTAuthMiddleware(jwtKey []byte) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("username", claims.Username)
+		c.Set("username", claims.Id)
 		c.Next()
 	}
 }
