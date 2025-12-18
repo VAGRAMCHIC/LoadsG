@@ -2,6 +2,7 @@ package lib
 
 type _httpMethod string
 
+
 const (
 	GET     _httpMethod = "GET"
 	POST    _httpMethod = "POST"
@@ -21,6 +22,14 @@ type HttpHead struct {
 	Headers      map[string]string `json:"headers"`
 }
 
+type Loader struct {
+	Id              int    `json:"id" binding:"required"`
+	Token           string `json:"token" binding:"required"`
+	Status          bool   `json:"status"`
+	Max_concurrency int    `json:"max_concurrency" binding:"required"`
+	Download_link   string `json:"download_link"`
+}
+
 type HTTPLoadRequest struct {
 	Id       int      `json:"id" binding:"required"`
 	HttpHead HttpHead `json:"httpHead" binding:"required"`
@@ -29,7 +38,8 @@ type HTTPLoadRequest struct {
 }
 
 type User struct {
-	UserName string `json:"username" binding:"required"`
+	Id       int
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -37,5 +47,20 @@ type Report struct {
 	LoadDuration float64           `json:"loadDuration" binding:"required"`
 	RPS          float64           `json:"rps" binding:"required"`
 	StatusCodes  map[int]int       `json:"statusCodes" binding:"required"`
-	Errors       map[string]string `json:"statusCodes" binding:"required"`
+	Errors       map[string]string `json:"errors" binding:"required"`
 }
+
+type DB_TABLE struct {
+	Name   string            `json:"name" binding:"required"`
+	Params map[string]string `json:"params" binding:"required"`
+}
+
+var DB_TABLE_USERS = DB_TABLE{
+	Name: "users",
+	Params: map[string]string{
+		"id":       "SERIAL PRIMARY KEY",
+		"username": "TEXT NOT NULL",
+		"password": "TEXT NOT NULL",
+	},
+}
+

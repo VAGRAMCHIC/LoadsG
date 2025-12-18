@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"fmt"
 	"loadsg/lib"
 	"loadsg/utils"
@@ -17,6 +18,19 @@ func main() {
 	}
 	fmt.Print(config)
 
-	lib.Server([]byte(config.JwtKey), config.MaxConcurrent)
+	conn:= lib.Connect(config.PgConn)
+	db_status, err := lib.InitDB(conn)
+	
+	if err != nil {
+		fmt.Println("Ошибка инициализации базы данных:", err)
+		return
+	}
+
+	if db_status != true {
+		fmt.Println("Ошибка инициализации базы данных:", db_status)
+		return
+	}
+
+	lib.Server([]byte(config.JwtKey), config.MaxConcurrent, conn)
 
 }

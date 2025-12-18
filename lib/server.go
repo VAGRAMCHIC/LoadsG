@@ -4,14 +4,12 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
-
+	"github.com/jackc/pgx/v5"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// var jwtKey = []byte("oquooKiezee6ohy") // Лучше хранить в .env
-var users = map[string]string{} // username -> password (для примера, без БД)
 
 // Claims описывает содержимое токена
 type Claims struct {
@@ -19,41 +17,52 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func Server(jwtKey []byte, maxConcurrent int) {
+func Server(jwtKey []byte, maxConcurrent int, pgConn *pgx.Conn) {
 	r := gin.Default()
 
 	// Регистрация нового пользователя
 	r.POST("/register", func(c *gin.Context) {
-		var creds struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
+		var creds User
+
 		if err := c.BindJSON(&creds); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		if _, exists := users[creds.Username]; exists {
+
+		fcreds, err := GetUser(pgConn, creds.Username)
+		if fcreds.Username != "" {
 			c.JSON(http.StatusConflict, gin.H{"error": "user exists"})
 			return
 		}
-		users[creds.Username] = creds.Password
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		if err := InsertUser(pgConn, creds); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{"message": "registered"})
 	})
 
 	// Авторизация (выдача токена)
 	r.POST("/login", func(c *gin.Context) {
-		var creds struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
+		var creds User
 		if err := c.BindJSON(&creds); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 			return
 		}
-		if users[creds.Username] != creds.Password {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		fcreds, err := GetUser(pgConn, creds.Username)
+		if fcreds.Username == "" {
+			c.JSON(http.StatusConflict, gin.H{"error": "user exists"})
 			return
 		}
+		fmt.Printf("%s, %s, %d", fcreds.Username, fcreds.Password, fcreds.Id)
+		if fcreds.Password != creds.Password {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials", fcreds.Password: creds.Password})
+			return
+		}
+	
 
 		// Генерируем токен
 		expirationTime := time.Now().Add(1 * time.Hour)
