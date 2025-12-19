@@ -15,8 +15,6 @@ func main() {
 		fmt.Println("Ошибка загрузки конфигурации:", err)
 		return
 	}
-	fmt.Print(config)
-	fmt.Print(config.PgConn)	
 	conn:= lib.Connect(config.PgConn)
 	db_status, err := lib.InitDB(conn)
 	
