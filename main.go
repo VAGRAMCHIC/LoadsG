@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 	fmt.Print(config)
-
+	fmt.Print(config.PgConn)	
 	conn:= lib.Connect(config.PgConn)
 	db_status, err := lib.InitDB(conn)
 	
