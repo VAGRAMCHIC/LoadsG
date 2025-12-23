@@ -11,6 +11,7 @@ import (
 
 func InitDB(conn *pgx.Conn) (bool, error) {
 	code, err := initTable(conn, DB_TABLE_USERS)
+	code, err = initTable(conn, DB_TABLE_HTTP_LOAD_JOB)
 	if err != nil {
 		return code, err
 	}
@@ -60,6 +61,9 @@ func Connect(pgConn string) *pgx.Conn {
 	return conn
 }
 
+
+// --------------- DB_TABLE_USERS ---------------------------
+
 func InsertUser(conn *pgx.Conn, user User) {
 	_, err := conn.Exec(context.Background(),
 		"INSERT INTO users (username, password) VALUES ($1, $2)", user.Id, user.Password)
@@ -83,3 +87,34 @@ func GetUser(conn *pgx.Conn, username string) (User, error) {
 	defer conn.Close(context.Background())
 	return user, err
 }
+
+
+// --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
+
+func InsertHTTPLoadJob(conn *pgx.Conn, loadJob HTTPLoadJob) {
+	_, err := conn.Exec(context.Background(),
+		"INSERT INTO users (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
+													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
+	if err != nil {
+		log.Fatalf("Insert data error: %s", err.Error())
+		defer conn.Close(context.Background())
+	}
+	defer conn.Close(context.Background())
+}
+
+
+func GetHTTPLoadJob(conn *pgx.Conn, id string) (HTTPLoadJob, error) {
+	var loadJob HTTPLoadJob
+	err := conn.QueryRow(context.Background(), "SELECT * FROM http_load_job where id=$1", id).Scan(&loadJob.JobName, &loadJob.Duration, &loadJob.Type, &loadJob.Payload, &loadJob.StartTime)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			// load job not found
+			return loadJob, nil
+		}
+		return loadJob, err
+	}
+	defer conn.Close(context.Background())
+	return loadJob, err
+}
+
+
