@@ -61,22 +61,11 @@ func Server(jwtKey []byte, maxConcurrent int, pgConn *pgx.Conn) {
 	auth := r.Group("/api")
 	auth.Use(JWTAuthMiddleware(jwtKey))
 	{
-		auth.GET("/me", func(c *gin.Context) {
-			user, _ := c.Get("username")
-			c.JSON(http.StatusOK, gin.H{"user": user})
-		})
 		auth.POST("/load/http", func(c *gin.Context) {
-			var loadRequest HTTPLoadRequest
-			if err := c.BindJSON(&loadRequest); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-			reportURL := "http://test.customlabs.ru/"
-			statusCodes, loadDuration, rps, _ := RunLoad(loadRequest, maxConcurrent, reportURL)
 			c.JSON(http.StatusOK, gin.H{
-				"loadDuration": loadDuration,
-				"statusCodes":  statusCodes,
-				"rps":          rps,
+				"loadDuration": "dur",
+				"statusCodes":  "test",
+				"rps":          1,
 			})
 		})
 	}

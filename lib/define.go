@@ -1,55 +1,37 @@
 package lib
 
-import "time"
-
-type _httpMethod string
-
-
-const (
-	GET     _httpMethod = "GET"
-	POST    _httpMethod = "POST"
-	PUT     _httpMethod = "PUT"
-	DELETE  _httpMethod = "DELETE"
-	CONNECT _httpMethod = "CONNECT"
-	PATCH   _httpMethod = "PATCH"
-	OPTIONS _httpMethod = "OPTIONS"
-	HEAD    _httpMethod = "HEAD"
+import (
+	"time"
+	"net/http"
 )
 
-type HttpHead struct {
-	Method       _httpMethod       `json:"method"`
-	URL          string            `json:"url"`
-	ProtoVersion string            `json:"proto_version"`
-	Length       int               `json:"length"`
-	Headers      map[string]string `json:"headers"`
+
+// -------- Token Bucket ------------
+
+type Generator interface {
+	Next() *http.Request
 }
 
-type Loader struct {
-	Id              int    `json:"id" binding:"required"`
-	Token           string `json:"token" binding:"required"`
-	Status          bool   `json:"status"`
-	Max_concurrency int    `json:"max_concurrency" binding:"required"`
-	Download_link   string `json:"download_link"`
+type Metric struct {
+	Latency time.Duration
+	Error   bool
 }
 
-type HTTPLoadRequest struct {
-	Id       int      `json:"id" binding:"required"`
-	HttpHead HttpHead `json:"httpHead" binding:"required"`
-	Body     string   `json:"body" binding:"required"`
-	Count    int      `json:"count" binding:"required"`
+// --------- Executor --------------
+
+type Executor struct {
+	client  *http.Client
+	workers int
+	jobs    chan *http.Request
+	metrics chan Metric
 }
+
 
 type User struct {
 	Id       string `json:"id" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-type Report struct {
-	LoadDuration float64           `json:"loadDuration" binding:"required"`
-	RPS          float64           `json:"rps" binding:"required"`
-	StatusCodes  map[int]int       `json:"statusCodes" binding:"required"`
-	Errors       map[string]string `json:"errors" binding:"required"`
-}
 
 type HTTPLoadJob struct{
 	Id 					string 							`json:"id" binding:"required"`
