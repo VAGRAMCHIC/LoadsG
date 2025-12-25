@@ -5,9 +5,7 @@ import (
 	"net/http"
 )
 
-
 type RateFunc func(elapsed time.Duration) float64
-
 
 // -------- Token Bucket ------------
 
@@ -29,11 +27,13 @@ type Executor struct {
 	metrics chan Metric
 }
 
+
+// --------- Scheduler --------------
+
 type Scheduler struct {
 	bucket    *TokenBucket
 	generator Generator
 	executor  *Executor
 	duration  time.Duration
 }
-
 

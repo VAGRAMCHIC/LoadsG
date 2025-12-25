@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 	"github.com/jackc/pgx/v5"
+	"loadsg/lib/model"
 )
 
 func InitDB(conn *pgx.Conn) (bool, error) {
@@ -64,28 +65,14 @@ func Connect(pgConn string) *pgx.Conn {
 
 // --------------- DB_TABLE_USERS ---------------------------
 
-func InsertUser(conn *pgx.Conn, user User) {
+func InsertUser(conn *pgx.Conn, user model.User) {
 	_, err := conn.Exec(context.Background(),
-		"INSERT INTO users (username, password) VALUES ($1, $2)", user.Id, user.Password)
+		"INSERT INTO users (uid, password) VALUES ($1, $2)", user.UID, user.PasswordHash)
 	if err != nil {
 		log.Fatalf("Insert data error: %s", err.Error())
 		defer conn.Close(context.Background())
 	}
 	defer conn.Close(context.Background())
-}
-
-func GetUser(conn *pgx.Conn, username string) (User, error) {
-	var user User
-	err := conn.QueryRow(context.Background(), "SELECT * FROM users where username=$1", username).Scan(&user.Id, &user.Password)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			// Пользователь не найден
-			return user, nil
-		}
-		return user, err
-	}
-	defer conn.Close(context.Background())
-	return user, err
 }
 
 

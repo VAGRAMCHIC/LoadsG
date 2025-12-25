@@ -1,4 +1,4 @@
-package lib
+package model
 
 import (
 	"time"
@@ -14,21 +14,6 @@ type HTTPLoadJob struct{
 	StartTime 	time.Time 					`json:"start_time" binding:"required"`
 }	
 
-// --------- DB_TABLES ----------------
-
-type DB_TABLE struct {
-	Name   string            `json:"name" binding:"required"`
-	Params map[string]string `json:"params" binding:"required"`
-}
-
-var DB_TABLE_USERS = DB_TABLE{
-	Name: "users",
-	Params: map[string]string{
-		"id":       "SERIAL PRIMARY KEY",
-		"username": "TEXT NOT NULL",
-		"password": "TEXT NOT NULL",
-	},
-}
 
 var DB_TABLE_HTTP_LOAD_JOB = DB_TABLE{
 	Name: "http_load_job",
