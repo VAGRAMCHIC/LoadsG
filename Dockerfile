@@ -1,4 +1,4 @@
-FROM golang:1.23.10-alpine AS build
+FROM golang:1.25.3-alpine AS build
 
 RUN apk add --no-cache git
 WORKDIR /app
@@ -8,6 +8,7 @@ RUN go mod tidy
 RUN go get github.com/gin-gonic/gin
 RUN go get github.com/golang-jwt/jwt/v5
 RUN go get github.com/jackc/pgx/v5
+RUN go get github.com/jackc/pgx/v5/pgxpool@v5.7.6
 COPY . .
 
 RUN go build -o app .
