@@ -2,6 +2,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 				req.PasswordHash,
     )
     if err != nil {
+				log.Printf("\nerror: %s", err.Error())
         c.JSON(http.StatusUnauthorized, gin.H{
             "error": "invalid id or password",
         })
