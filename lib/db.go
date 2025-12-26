@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 	"github.com/jackc/pgx/v5"
-	"loadsg/lib/model"
 )
 
 func InitDB(conn *pgx.Conn) (bool, error) {
@@ -63,24 +62,12 @@ func Connect(pgConn string) *pgx.Conn {
 }
 
 
-// --------------- DB_TABLE_USERS ---------------------------
-
-func InsertUser(conn *pgx.Conn, user model.User) {
-	_, err := conn.Exec(context.Background(),
-		"INSERT INTO users (uid, password) VALUES ($1, $2)", user.UID, user.PasswordHash)
-	if err != nil {
-		log.Fatalf("Insert data error: %s", err.Error())
-		defer conn.Close(context.Background())
-	}
-	defer conn.Close(context.Background())
-}
-
 
 // --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
 
 func InsertHTTPLoadJob(conn *pgx.Conn, loadJob HTTPLoadJob) {
 	_, err := conn.Exec(context.Background(),
-		"INSERT INTO users (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
+		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
 													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
 	if err != nil {
 		log.Fatalf("Insert data error: %s", err.Error())

@@ -34,8 +34,7 @@ func main() {
 
 	conn:= lib.Connect(config.PgConn)
 	
-	db_status, err := lib.InitDB(conn)
-	
+	db_status, err := lib.InitDB(conn)	
 	if err != nil {
 		fmt.Println("Ошибка инициализации базы данных:", err)
 		return

@@ -25,7 +25,7 @@ var DB_TABLE_USERS = DB_TABLE{
 	Name: "users",
 	Params: map[string]string{
 		"id":       "SERIAL PRIMARY KEY",
-		"username": "TEXT NOT NULL",
+		"uid": 			"TEXT NOT NULL",
 		"password": "TEXT NOT NULL",
 	},
 }

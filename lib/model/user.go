@@ -1,8 +1,6 @@
 package model
 
 
-//----------- User ------------------
-
 type User struct {
 	UID       string `json:"uid" binding:"required"`
 	PasswordHash string `json:"password" binding:"required"`
