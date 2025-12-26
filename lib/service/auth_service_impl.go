@@ -31,7 +31,7 @@ func (s *authService) Login(
     uid string, password string,
 ) (string, error) {
 
-    user, err := s.users.GetById(ctx, uid)
+    user, err := s.users.GetByUID(ctx, uid)
     if err != nil {
         return "", ErrInvalidCredentials
     }

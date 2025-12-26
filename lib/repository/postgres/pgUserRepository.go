@@ -20,7 +20,7 @@ func NewUserRepository(db *pgxpool.Pool) repository.UserRepository {
 	}
 }
 
-func (r *UserRepository) GetById(ctx context.Context, uid string) (*model.User, error){
+func (r *UserRepository) GetByUID(ctx context.Context, uid string) (*model.User, error){
 	var user model.User
 	err := r.db.QueryRow(context.Background(), "SELECT * FROM users where uid=$1", uid).Scan(&user.UID, &user.PasswordHash)
 	if err != nil{
