@@ -4,6 +4,7 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -33,6 +34,7 @@ func (s *authService) Login(
 
     user, err := s.users.GetByUID(ctx, uid)
     if err != nil {
+				log.Printf("user: %s, sent_uid: %s", user.UID, uid)
         return "", ErrInvalidCredentials
     }
 
@@ -40,6 +42,7 @@ func (s *authService) Login(
         []byte(user.PasswordHash),
         []byte(password),
     ); err != nil {
+				log.Printf("pass: %s",password)
         return "", ErrInvalidCredentials
     }
 

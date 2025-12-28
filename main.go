@@ -52,10 +52,10 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(userRepo, *jwtManager)
 
-	userHandler := handler.NewUserHandler(userService)
-	authHandler := handler.NewAuthHandler(authService)
+	handler := handler.NewHandler(userService, authService)
 
-	router.RegisterRoutes(r, userHandler, authHandler)
+
+	router.RegisterRoutes(r, handler)
 
 	log.Fatal(r.Run(":8080"))
 

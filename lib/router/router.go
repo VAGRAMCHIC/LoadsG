@@ -9,14 +9,11 @@ import (
 
 func RegisterRoutes(
 	r *gin.Engine,
-	user *handler.UserHandler,
-	auth *handler.AuthHandler,
+	h *handler.Handler,
 ) {
 	v1 := r.Group("/v1")
-	{
-		v1.POST("/register", user.Create)
-		v1.POST("/login", auth.Login)
-	}
+	registerAuth(v1, h)
+	registerUserPrivate(v1, h)
 }
 
 

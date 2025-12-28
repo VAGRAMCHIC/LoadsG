@@ -1,4 +1,4 @@
-package model
+package dto
 
 import (
 	"time"
@@ -12,17 +12,3 @@ type HTTPLoadJob struct{
 	Payload 		map[string]string 	`json:"payload" binding:"required"`
 	StartTime 	time.Time 					`json:"start_time" binding:"required"`
 }	
-
-var DB_TABLE_HTTP_LOAD_JOB = DB_TABLE{
-	Name: "http_load_job",
-	Params: map[string]string{
-		"id":       	"SERIAL PRIMARY KEY",
-		"job_name": 	"TEXT NOT NULL",
-		"duration": 	"REAL",
-		"type":				"TEXT NOT NULL",
-		"payload":  	"JSONB NOT NULL",
-		"start_time": "TIMESTAMPTZ",
-	},
-}
-
-

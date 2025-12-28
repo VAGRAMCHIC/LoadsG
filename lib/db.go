@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 	"github.com/jackc/pgx/v5"
+
+	"loadsg/lib/model"
 )
 
 func InitDB(conn *pgx.Conn) (bool, error) {
@@ -65,7 +67,7 @@ func Connect(pgConn string) *pgx.Conn {
 
 // --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
 
-func InsertHTTPLoadJob(conn *pgx.Conn, loadJob HTTPLoadJob) {
+func InsertHTTPLoadJob(conn *pgx.Conn, loadJob model.HTTPLoadJob) {
 	_, err := conn.Exec(context.Background(),
 		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
 													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
@@ -77,8 +79,8 @@ func InsertHTTPLoadJob(conn *pgx.Conn, loadJob HTTPLoadJob) {
 }
 
 
-func GetHTTPLoadJob(conn *pgx.Conn, id string) (HTTPLoadJob, error) {
-	var loadJob HTTPLoadJob
+func GetHTTPLoadJob(conn *pgx.Conn, id string) (model.HTTPLoadJob, error) {
+	var loadJob model.HTTPLoadJob
 	err := conn.QueryRow(context.Background(), "SELECT * FROM http_load_job where id=$1", id).Scan(&loadJob.JobName, &loadJob.Duration, &loadJob.Type, &loadJob.Payload, &loadJob.StartTime)
 	if err != nil {
 		if err == pgx.ErrNoRows {

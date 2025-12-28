@@ -32,3 +32,8 @@
 *.out
 *.app
 app
+
+#Project
+docker-compose.test.yaml
+run_build.sh
+.obsidian
