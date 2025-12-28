@@ -12,6 +12,7 @@ services:
       PG_CONN: "postgres://testuser:testpassword@db:5432/loadsg"
       MAX_CONCURRENT: 10
       JWT_KEY: OoGael1eiVeighoo3eighoh9ze8mewosvveER
+      APP_NAME: load_gen 
       KEY: test_pass
       ID: test_user
     networks:

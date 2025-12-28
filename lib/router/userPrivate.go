@@ -1,19 +1,19 @@
 package router
 
-
 import (
-	"github.com/gin-gonic/gin"
-
 	"loadsg/lib/handler"
 	"loadsg/lib/middleware"
+	"loadsg/lib/security"
+
+	"github.com/gin-gonic/gin"
 )
 
 func registerUserPrivate(r *gin.RouterGroup, 
 	h *handler.Handler,
-	
-){
+	s *security.JWTManager,
+	){
 	uR := r.Group("/users")
 
-	uR.Use(middleware.AuthRequired())
+	uR.Use(middleware.AuthRequired(s))
 	r.POST("/create", h.User.Create)
 }

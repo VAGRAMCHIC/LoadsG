@@ -47,7 +47,7 @@ func main() {
 	r := gin.Default()
 
 	userRepo := postgres.NewUserRepository(dbpool)
-	jwtManager := security.NewJWTManager(config.JwtKey, 3600)
+	jwtManager := security.NewJWTManager(config.JwtKey, config.AppName, 3600)
 
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(userRepo, *jwtManager)
@@ -55,7 +55,7 @@ func main() {
 	handler := handler.NewHandler(userService, authService)
 
 
-	router.RegisterRoutes(r, handler)
+	router.RegisterRoutes(r, handler, jwtManager)
 
 	log.Fatal(r.Run(":8080"))
 

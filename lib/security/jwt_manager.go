@@ -3,17 +3,24 @@ package security
 
 import (
 	"time"
-
+	"errors"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type JWTManager struct {
-	secret string
-	ttl    int64
+	secret []byte
+	issuer string
+	ttl int64
 }
 
-func NewJWTManager(secret string, ttl int64) *JWTManager {
-	return &JWTManager{secret: secret, ttl: ttl}
+type Claims struct {
+	UserID string `json:"uid"`
+	jwt.RegisteredClaims
+}
+
+
+func NewJWTManager(secret, issuer string, ttl int64) *JWTManager {
+	return &JWTManager{secret: []byte(secret), issuer: issuer, ttl: ttl}
 }
 
 func (j *JWTManager) Generate(userID string) (string, error) {
@@ -26,4 +33,29 @@ func (j *JWTManager) Generate(userID string) (string, error) {
 	return token.SignedString([]byte(j.secret))
 }
 
+
+func (j *JWTManager) Validate(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&Claims{},
+		func(t *jwt.Token) (interface{}, error) {
+			if t.Method != jwt.SigningMethodHS256 {
+				return nil, errors.New("unexpected signing method")
+			}
+			return j.secret, nil
+		},
+		jwt.WithIssuer(j.issuer),
+		jwt.WithLeeway(2*time.Minute),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	return claims, nil
+}
 
