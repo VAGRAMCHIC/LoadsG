@@ -1,9 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"loadsg/lib"
+	"loadsg/lib/handler"
+	"loadsg/lib/repository/postgres"
+	"loadsg/lib/router"
+	"loadsg/lib/security"
+	"loadsg/lib/service"
 	"loadsg/utils"
+	"log"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -15,9 +25,16 @@ func main() {
 		fmt.Println("Ошибка загрузки конфигурации:", err)
 		return
 	}
-	conn:= lib.Connect(config.PgConn)
-	db_status, err := lib.InitDB(conn)
 	
+	ctx:= context.Background()
+	dbpool, err:= pgxpool.New(ctx, config.PgConn)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conn:= lib.Connect(config.PgConn)
+	
+	db_status, err := lib.InitDB(conn)	
 	if err != nil {
 		fmt.Println("Ошибка инициализации базы данных:", err)
 		return
@@ -27,12 +44,19 @@ func main() {
 		fmt.Println("Ошибка инициализации базы данных:", db_status)
 		return
 	}
-	user:= lib.User{
-		Id: config.Id,
-		Password: config.Key,
-	}
-	lib.InsertUser(conn, user)
+	r := gin.Default()
 
-	lib.Server([]byte(config.JwtKey), config.MaxConcurrent, conn)
+	userRepo := postgres.NewUserRepository(dbpool)
+	jwtManager := security.NewJWTManager(config.JwtKey, 3600)
+
+	userService := service.NewUserService(userRepo)
+	authService := service.NewAuthService(userRepo, *jwtManager)
+
+	handler := handler.NewHandler(userService, authService)
+
+
+	router.RegisterRoutes(r, handler)
+
+	log.Fatal(r.Run(":8080"))
 
 }

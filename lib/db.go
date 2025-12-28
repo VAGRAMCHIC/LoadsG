@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 	"github.com/jackc/pgx/v5"
+
+	"loadsg/lib/model"
 )
 
 func InitDB(conn *pgx.Conn) (bool, error) {
@@ -62,38 +64,12 @@ func Connect(pgConn string) *pgx.Conn {
 }
 
 
-// --------------- DB_TABLE_USERS ---------------------------
-
-func InsertUser(conn *pgx.Conn, user User) {
-	_, err := conn.Exec(context.Background(),
-		"INSERT INTO users (username, password) VALUES ($1, $2)", user.Id, user.Password)
-	if err != nil {
-		log.Fatalf("Insert data error: %s", err.Error())
-		defer conn.Close(context.Background())
-	}
-	defer conn.Close(context.Background())
-}
-
-func GetUser(conn *pgx.Conn, username string) (User, error) {
-	var user User
-	err := conn.QueryRow(context.Background(), "SELECT * FROM users where username=$1", username).Scan(&user.Id, &user.Password)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			// Пользователь не найден
-			return user, nil
-		}
-		return user, err
-	}
-	defer conn.Close(context.Background())
-	return user, err
-}
-
 
 // --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
 
-func InsertHTTPLoadJob(conn *pgx.Conn, loadJob HTTPLoadJob) {
+func InsertHTTPLoadJob(conn *pgx.Conn, loadJob model.HTTPLoadJob) {
 	_, err := conn.Exec(context.Background(),
-		"INSERT INTO users (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
+		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
 													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
 	if err != nil {
 		log.Fatalf("Insert data error: %s", err.Error())
@@ -103,8 +79,8 @@ func InsertHTTPLoadJob(conn *pgx.Conn, loadJob HTTPLoadJob) {
 }
 
 
-func GetHTTPLoadJob(conn *pgx.Conn, id string) (HTTPLoadJob, error) {
-	var loadJob HTTPLoadJob
+func GetHTTPLoadJob(conn *pgx.Conn, id string) (model.HTTPLoadJob, error) {
+	var loadJob model.HTTPLoadJob
 	err := conn.QueryRow(context.Background(), "SELECT * FROM http_load_job where id=$1", id).Scan(&loadJob.JobName, &loadJob.Duration, &loadJob.Type, &loadJob.Payload, &loadJob.StartTime)
 	if err != nil {
 		if err == pgx.ErrNoRows {
