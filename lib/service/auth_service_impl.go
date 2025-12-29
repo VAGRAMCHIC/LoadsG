@@ -50,7 +50,7 @@ func (s *authService) Login(
     if err != nil {
         return "", err
     }
-
+		
     return token, nil
 }
 

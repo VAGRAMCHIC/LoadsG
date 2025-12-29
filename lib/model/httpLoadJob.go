@@ -16,13 +16,14 @@ type HTTPLoadJob struct{
 var DB_TABLE_HTTP_LOAD_JOB = DB_TABLE{
 	Name: "http_load_job",
 	Params: map[string]string{
-		"id":       	"SERIAL PRIMARY KEY",
+		"id":       	"UUID NOT NULL",
 		"job_name": 	"TEXT NOT NULL",
 		"duration": 	"REAL",
 		"type":				"TEXT NOT NULL",
 		"payload":  	"JSONB NOT NULL",
 		"start_time": "TIMESTAMPTZ",
 	},
+	PrimaryKey: []string{"id"},
 }
 
 

@@ -5,12 +5,13 @@ import (
 	"time"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gin-gonic/gin"
 )
 
 type JWTManager struct {
 	secret []byte
 	issuer string
-	ttl int64
+	expires_at int64
 }
 
 type Claims struct {
@@ -19,20 +20,44 @@ type Claims struct {
 }
 
 
-func NewJWTManager(secret, issuer string, ttl int64) *JWTManager {
-	return &JWTManager{secret: []byte(secret), issuer: issuer, ttl: ttl}
+func NewJWTManager(secret, issuer string, expires_at int64) *JWTManager {
+	return &JWTManager{secret: []byte(secret), issuer: issuer, expires_at: expires_at}
 }
 
 func (j *JWTManager) Generate(userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub": userID,
-		"exp": time.Now().Add(time.Second * time.Duration(j.ttl)).Unix(),
+		"exp": j.expires_at,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(j.secret))
 }
 
+
+func setRefreshCookie(c *gin.Context, refreshToken string) {
+	c.SetCookie(
+		"refresh_token",        // name
+		refreshToken,           // value
+		int((30 * 24 * time.Hour).Seconds()), // maxAge
+		"/auth/refresh",        // path
+		"",                     // domain ("" = текущий)
+		true,                   // secure (true в prod)
+		true,                   // httpOnly
+	)
+}
+
+func clearRefreshCookie(c *gin.Context) {
+	c.SetCookie(
+		"refresh_token",
+		"",
+		-1,
+		"/auth/refresh",
+		"",
+		true,
+		true,
+	)
+}
 
 func (j *JWTManager) Validate(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(

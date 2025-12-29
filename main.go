@@ -13,7 +13,6 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -27,23 +26,19 @@ func main() {
 	}
 	
 	ctx:= context.Background()
-	dbpool, err:= pgxpool.New(ctx, config.PgConn)
+
+	
+	dbpool, err := lib.InitPool(ctx, config.PgConn)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer dbpool.Close()
 
-	conn:= lib.Connect(config.PgConn)
-	
-	db_status, err := lib.InitDB(conn)	
-	if err != nil {
-		fmt.Println("Ошибка инициализации базы данных:", err)
-		return
+	if err := lib.InitDB(ctx, dbpool); err != nil {
+		log.Fatal(err)
 	}
 
-	if db_status != true {
-		fmt.Println("Ошибка инициализации базы данных:", db_status)
-		return
-	}
+
 	r := gin.Default()
 
 	userRepo := postgres.NewUserRepository(dbpool)

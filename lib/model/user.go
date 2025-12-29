@@ -10,10 +10,10 @@ type User struct {
 var DB_TABLE_USERS = DB_TABLE{
 	Name: "users",
 	Params: map[string]string{
-		"id":       		 "SERIAL PRIMARY KEY",
-		"uid":					 "TEXT NOT NULL",
+		"id":       		 "UUID NOT NULL",
 		"password_hash": "TEXT NOT NULL",
 	},
+	PrimaryKey: []string{"id"},
 }
 
 

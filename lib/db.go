@@ -6,22 +6,33 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"loadsg/lib/model"
 )
 
-func InitDB(conn *pgx.Conn) (bool, error) {
-	code, err := initTable(conn, DB_TABLE_USERS)
-	code, err = initTable(conn, DB_TABLE_HTTP_LOAD_JOB)
-	if err != nil {
-		return code, err
+
+func InitDB(ctx context.Context, pool *pgxpool.Pool) error {
+	tables := []model.DB_TABLE{
+		model.DB_TABLE_USERS,
+		model.DB_TABLE_HTTP_LOAD_JOB,
+		model.DB_TABLE_JWTTOKENS,
 	}
-	return code, err
+
+	for _, table := range tables {
+		if err := initTable(ctx, pool, table); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func initTable(conn *pgx.Conn, table DB_TABLE) (bool, error) {
-	var init_table_line string
+
+func initTable(
+	ctx context.Context,
+	pool *pgxpool.Pool,
+	table model.DB_TABLE,
+) error {
 
 	var keys []string
 	for k := range table.Params {
@@ -32,65 +43,83 @@ func initTable(conn *pgx.Conn, table DB_TABLE) (bool, error) {
 	var b strings.Builder
 	b.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (\n", table.Name))
 
-	for i, k := range keys {
+	for _, k := range keys {
 		b.WriteString(fmt.Sprintf("    %s %s", k, table.Params[k]))
-		if i < len(keys)-1 {
-			b.WriteString(",\n") // запятая только между полями
-		} else {
-			b.WriteString("\n") // без запятой на последней строке
+		b.WriteString(",\n")
+	}
+
+	if len(table.PrimaryKey) > 0 {
+		b.WriteString(fmt.Sprintf(
+			"    PRIMARY KEY (%s),\n",
+			strings.Join(table.PrimaryKey, ", "),
+		))
+	}
+
+	for _, fk := range table.ForeignKeys {
+		b.WriteString(fmt.Sprintf(
+			"    FOREIGN KEY (%s) REFERENCES %s(%s)",
+			fk.Column,
+			fk.RefTable,
+			fk.RefColumn,
+		))
+		if fk.OnDelete != "" {
+			b.WriteString(" ON DELETE " + fk.OnDelete)
 		}
+		b.WriteString(",\n")
 	}
-	b.WriteString(");")
 
-	init_table_line = b.String()
-	fmt.Printf("Create table %s: %s", table.Name, init_table_line)
-	_, err := conn.Exec(context.Background(), init_table_line)
-	//defer conn.Close(context.Background())
-	if err != nil {
-		log.Printf("cant create table: %s", err.Error())
-		return false, err
-	}
-	return true, err
+	sql := strings.TrimSuffix(b.String(), ",\n") + "\n);"
+
+	_, err := pool.Exec(ctx, sql)
+	return err
 }
 
 
-
-func Connect(pgConn string) *pgx.Conn {
-	conn, err := pgx.Connect(context.Background(), pgConn)
+func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
-		log.Printf("cant create connection: %s", err.Error())
+		return nil, err
 	}
-	return conn
+
+	// проверяем соединение
+	if err := pool.Ping(ctx); err != nil {
+		pool.Close()
+		return nil, err
+	}
+
+	log.Println("database pool initialized")
+	return pool, nil
 }
+
 
 
 
 // --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
 
-func InsertHTTPLoadJob(conn *pgx.Conn, loadJob model.HTTPLoadJob) {
-	_, err := conn.Exec(context.Background(),
-		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
-													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
-	if err != nil {
-		log.Fatalf("Insert data error: %s", err.Error())
-		defer conn.Close(context.Background())
-	}
-	defer conn.Close(context.Background())
-}
+//func InsertHTTPLoadJob(conn *pgx.Conn, loadJob model.HTTPLoadJob) {
+//	_, err := conn.Exec(context.Background(),
+//		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
+//													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
+//	if err != nil {
+//		log.Fatalf("Insert data error: %s", err.Error())
+//		defer conn.Close(context.Background())
+//	}
+//	defer conn.Close(context.Background())
+//}
 
 
-func GetHTTPLoadJob(conn *pgx.Conn, id string) (model.HTTPLoadJob, error) {
-	var loadJob model.HTTPLoadJob
-	err := conn.QueryRow(context.Background(), "SELECT * FROM http_load_job where id=$1", id).Scan(&loadJob.JobName, &loadJob.Duration, &loadJob.Type, &loadJob.Payload, &loadJob.StartTime)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			// load job not found
-			return loadJob, nil
-		}
-		return loadJob, err
-	}
-	defer conn.Close(context.Background())
-	return loadJob, err
-}
+//func GetHTTPLoadJob(conn *pgx.Conn, id string) (model.HTTPLoadJob, error) {
+//	var loadJob model.HTTPLoadJob
+//	err := conn.QueryRow(context.Background(), "SELECT * FROM http_load_job where id=$1", id).Scan(&loadJob.JobName, &loadJob.Duration, &loadJob.Type, &loadJob.Payload, &loadJob.StartTime)
+//	if err != nil {
+//		if err == pgx.ErrNoRows {
+//			// load job not found
+//			return loadJob, nil
+//		}
+//		return loadJob, err
+//	}
+//	defer conn.Close(context.Background())
+//	return loadJob, err
+//}
 
 
