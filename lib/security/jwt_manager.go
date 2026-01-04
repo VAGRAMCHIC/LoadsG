@@ -25,28 +25,50 @@ func NewJWTManager(secret, refreshSecret, issuer string, expires_at int64) *JWTM
 }
 
 
-func (j *JWTManager) Generate(userID string) (string, error) {
+
+func (j *JWTManager) Generate(userID string) (string, time.Time, error) {
+	expiresAt := time.Now().Add(time.Duration(j.expires_at))
+
 	claims := jwt.RegisteredClaims{
-		Subject: userID,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(j.expires_at))),
-		IssuedAt: jwt.NewNumericDate(time.Now()),
-		Issuer: j.issuer,
+		Subject:   userID,
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		Issuer:    j.issuer,
 	}
-	
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(j.secret))
+
+	signed, err := token.SignedString(j.secret)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return signed, expiresAt, nil
 }
 
 
-func (j *JWTManager) GenerateRefresh(userID string) (string, error){
-	claims := &jwt.RegisteredClaims{
-		Subject: userID,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(7*24*time.Hour)),
-		IssuedAt: jwt.NewNumericDate(time.Now()),
-		Issuer: j.issuer,
+
+func (j *JWTManager) GenerateRefresh(
+	userID string,
+) (string, time.Time, error) {
+
+	expiresAt := time.Now().Add(7 * 24 * time.Hour)
+
+	claims := jwt.RegisteredClaims{
+		Subject:   userID,
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		Issuer:    j.issuer,
 	}
-	token:=jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(j.refreshSecret))
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	signed, err := token.SignedString(j.refreshSecret)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return signed, expiresAt, nil
 }
 
 

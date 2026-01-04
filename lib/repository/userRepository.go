@@ -11,6 +11,7 @@ var ErrUserNotFound = errors.New("user not found")
 
 type UserRepository interface {
 	GetByUID(ctx context.Context, uid string) (*model.User, error)
+	GetByComment(ctx context.Context, comment string) (*model.User, error)
 	Create(ctx context.Context, user *model.User) (*model.User, error)
 }
 

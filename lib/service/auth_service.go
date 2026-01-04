@@ -5,6 +5,6 @@ import (
 )
 
 type AuthService interface {
-    Login(ctx context.Context, uid string, password string) (token string, refreshToken string, err error)
+    Login(ctx context.Context, uid string, password string) (token map[string]string, refreshToken map[string]string, err error)
 }
 

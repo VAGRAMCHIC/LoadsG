@@ -8,12 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func registerUserPrivate(r *gin.RouterGroup, 
+func registerUserPrivate(
+	r *gin.RouterGroup,
 	h *handler.Handler,
 	s *security.JWTManager,
-	){
+) {
 	uR := r.Group("/users")
-
 	uR.Use(middleware.AuthRequired(s))
-	r.POST("/create", h.User.Create)
+
+	uR.POST("/create", h.User.Create)
 }
+
+

@@ -6,7 +6,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-    AccessToken  string `json:"access_token"`
-    RefreshToken string `json:"refresh_token"`
+    AccessToken  map[string]string `json:"access_token"`
+    RefreshToken map[string]string `json:"refresh_token"`
 }
 

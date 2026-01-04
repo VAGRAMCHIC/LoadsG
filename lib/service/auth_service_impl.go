@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
-	"loadsg/lib/repository"
 	"loadsg/lib/model"
+	"loadsg/lib/repository"
 	"loadsg/lib/security"
 )
 
@@ -32,12 +33,12 @@ func NewAuthService(
 func (s *authService) Login(
     ctx context.Context,
     uid string, token string,
-) (string, string, error) {
+) (map[string]string, map[string]string, error) {
 
     user, err := s.users.GetByUID(ctx, uid)
     if err != nil {
 			log.Printf("user: %s, sent_uid: %s", user.UID, uid)
-      return "","", ErrInvalidCredentials
+			return map[string]string{"":""},map[string]string{"":""}, ErrInvalidCredentials
     }
 
     if err := bcrypt.CompareHashAndPassword(
@@ -45,23 +46,24 @@ func (s *authService) Login(
       []byte(token),
     ); err != nil {
 			log.Printf("token: %s", token)
-      return "","", ErrInvalidCredentials
+			return map[string]string{"":""},map[string]string{"":""}, ErrInvalidCredentials
     }
 
-		acces_token, err := s.jwt.Generate(user.UID)
+		acces_token, acExp, err := s.jwt.Generate(user.UID)
     if err != nil {
-      return "","", err
+			return map[string]string{"":""},map[string]string{"":""}, err
     }
-		refreshToken, err := s.jwt.GenerateRefresh(user.UID)
+		refreshToken, reExp, err := s.jwt.GenerateRefresh(user.UID)
 		if err != nil {
-			return "","", err
+			return map[string]string{"":""},map[string]string{"":""}, err
 		}
 		
 		jwtRefreshToken := &model.JWTRefreshToken{
 			UserUid : user.UID,
-			TokenHash: refreshToken,	
+			TokenHash: refreshToken,
+			ExpiresAt: reExp,
 		}
 		s.tokens.Create(ctx, jwtRefreshToken)
-	return acces_token, refreshToken, nil
+	return map[string]string{acces_token:acExp.Format(time.RFC3339)}, map[string]string{refreshToken:reExp.Format(time.RFC3339)}, nil
 }
 

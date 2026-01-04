@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	Id            string `json:"id"`
-	Key           string `json:"key"`
+	RootUser      string `json:"rootUser"`
+	RootToken     string `json:"rootToken"`
 	JwtKey        string `json:"jwtKey"`
 	JwtRefreshKey string `json:"jwtRefreshKey"`
 	AppName       string `json:"appName"`
@@ -20,14 +20,14 @@ type Config struct {
 
 func ReadOSENV() (Config, error) {
 	var config Config
-	config.Id = os.Getenv("ID")
-	config.Key = os.Getenv("KEY")
+	config.RootUser = os.Getenv("ROOT_USER")
+	config.RootToken = os.Getenv("ROOT_TOKEN")
 	config.JwtKey = os.Getenv("JWT_KEY")
 	config.JwtRefreshKey = os.Getenv("JWT_REFRESH_KEY")
 	config.AppName = os.Getenv("APP_NAME")
 	config.MaxConcurrent, _ = strconv.Atoi(os.Getenv("MAX_CONCURRENT"))
 	config.PgConn = os.Getenv("PG_CONN")
-	if config.JwtKey == "" || config.PgConn == "" || config.Key == "" {
+	if config.JwtKey == "" || config.PgConn == "" || config.RootToken == "" {
 		return config, errors.New("cant read config envs")
 	}
 	return config, nil

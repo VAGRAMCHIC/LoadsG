@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"loadsg/lib"
+	"loadsg/lib/dto"
 	"loadsg/lib/handler"
 	"loadsg/lib/repository/postgres"
 	"loadsg/lib/router"
@@ -38,20 +39,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-
 	r := gin.Default()
 
 	userRepo := postgres.NewUserRepository(dbpool)
 	jwtRepo := postgres.NewJWTRefreshRepository(dbpool)
-	jwtManager := security.NewJWTManager(config.JwtKey, config.JwtRefreshKey, config.AppName, 300)
 
+	jwtManager := security.NewJWTManager(config.JwtKey, config.JwtRefreshKey, config.AppName, 300)
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(userRepo, jwtRepo, *jwtManager)
-
+	
 	handler := handler.NewHandler(userService, authService)
 
-
+	
 	router.RegisterRoutes(r, handler, jwtManager)
+	log.Print("test\n")
+	rootUser, err:= userRepo.GetByComment(ctx, config.RootUser)
+	log.Print(rootUser)
+	if err!= nil {
+		var createUser dto.CreateUserRequest
+		createUser.Comment = config.RootUser
+		createUser.Token = config.RootToken
+		_, err:= userService.Create(ctx, createUser)
+		if err != nil{
+			log.Fatalf("cant create root user: %s", err)
+		}
+	}
 
 	log.Fatal(r.Run(":8080"))
 
