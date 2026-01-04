@@ -13,5 +13,7 @@ type DB_TABLE struct {
 	Name   string            `json:"name" binding:"required"`
 	Params map[string]string `json:"params" binding:"required"`
 	PrimaryKey  []string
+	InlinePrimaryKey bool
 	ForeignKeys []ForeignKey
 }
+

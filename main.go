@@ -42,10 +42,11 @@ func main() {
 	r := gin.Default()
 
 	userRepo := postgres.NewUserRepository(dbpool)
-	jwtManager := security.NewJWTManager(config.JwtKey, config.AppName, 3600)
+	jwtRepo := postgres.NewJWTRefreshRepository(dbpool)
+	jwtManager := security.NewJWTManager(config.JwtKey, config.JwtRefreshKey, config.AppName, 300)
 
 	userService := service.NewUserService(userRepo)
-	authService := service.NewAuthService(userRepo, *jwtManager)
+	authService := service.NewAuthService(userRepo, jwtRepo, *jwtManager)
 
 	handler := handler.NewHandler(userService, authService)
 

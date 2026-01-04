@@ -28,21 +28,21 @@ func (h *AuthHandler) Login(c *gin.Context) {
         return
     }
 
-    token, err := h.service.Login(
+    token, refreshToken, err := h.service.Login(
         c.Request.Context(),
         req.UID,
-				req.PasswordHash,
+				req.TokenHash,
     )
     if err != nil {
 				log.Printf("\nerror: %s", err.Error())
         c.JSON(http.StatusUnauthorized, gin.H{
-            "error": "invalid id or password",
+            "error": "invalid id or token",
         })
         return
     }
 
     c.JSON(http.StatusOK, dto.LoginResponse{
-        AccessToken: token,
+        AccessToken: token, RefreshToken: refreshToken,
     })
 }
 

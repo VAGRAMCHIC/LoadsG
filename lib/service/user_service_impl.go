@@ -19,14 +19,14 @@ func NewUserService(r repository.UserRepository) UserService {
 }
 
 func (s *userService) Create(ctx context.Context, req dto.CreateUserRequest) (*model.User, error) {
-    hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+    hash, err := bcrypt.GenerateFromPassword([]byte(req.Token), bcrypt.DefaultCost)
     if err != nil {
         return nil, err
     }
 
     user := &model.User{
-        UID:        req.UID,
-        PasswordHash: string(hash),
+        Comment:        req.Comment,
+        Token: string(hash),
     }
 	  	
     return s.repo.Create(ctx, user)

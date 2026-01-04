@@ -43,18 +43,20 @@ func initTable(
 	var b strings.Builder
 	b.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (\n", table.Name))
 
+	// columns
 	for _, k := range keys {
-		b.WriteString(fmt.Sprintf("    %s %s", k, table.Params[k]))
-		b.WriteString(",\n")
+		b.WriteString(fmt.Sprintf("    %s %s,\n", k, table.Params[k]))
 	}
 
-	if len(table.PrimaryKey) > 0 {
+	// table-level primary key (если НЕ inline)
+	if len(table.PrimaryKey) > 0 && !table.InlinePrimaryKey {
 		b.WriteString(fmt.Sprintf(
 			"    PRIMARY KEY (%s),\n",
 			strings.Join(table.PrimaryKey, ", "),
 		))
 	}
 
+	// foreign keys
 	for _, fk := range table.ForeignKeys {
 		b.WriteString(fmt.Sprintf(
 			"    FOREIGN KEY (%s) REFERENCES %s(%s)",
