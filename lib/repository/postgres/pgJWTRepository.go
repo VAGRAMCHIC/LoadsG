@@ -33,10 +33,10 @@ func (r *JWTRefreshRepository) GetByJWTHash(ctx context.Context, hash string) (*
 }
 
 func (r *JWTRefreshRepository) Create(ctx context.Context, jwt *model.JWTRefreshToken) (*model.JWTRefreshToken, error){
-	_, err := r.db.Exec(context.Background(),
-		"INSERT INTO refresh_tokens (uid, token_hash) VALUES ($1, $2)", jwt.UserUid, jwt.TokenHash)
+	err := r.db.QueryRow(context.Background(),
+		"INSERT INTO refresh_tokens (user_uid, token_hash) VALUES ($1, $2) RETURNING user_uid, token_hash", jwt.UserUid, jwt.TokenHash).Scan(&jwt.UserUid, &jwt.TokenHash)
 	if err != nil {
-		log.Fatalf("Insert data error: %s", err.Error())
+		log.Fatalf("Insert data error: %s", err)
 	}
-	return jwt, err
+	return jwt, nil
 }
