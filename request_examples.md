@@ -18,4 +18,9 @@ curl -X POST http://localhost:8080/v1/users/create \
 
 ## Login
 
-curl -X POST http://localhost:8080/v1/login   -H "Content-Type: application/json"   -d '{"uid":"UID","token":"12345678"}'
+curl -i -X POST http://localhost:8080/v1/login   -H "Content-Type: application/json"   -d '{"uid":"UID","token":"12345678"}'
+
+#### Refresh
+
+curl -i -X POST http://localhost:8080/v1/auth/refresh \
+  -H "Cookie: refresh_token=eyJhbGciOi..."

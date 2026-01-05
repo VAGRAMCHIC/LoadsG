@@ -10,5 +10,7 @@ func registerAuth(r *gin.RouterGroup,
 	h *handler.Handler,
 	
 ){
-	r.POST("/login", h.Auth.Login)
+	auth := r.Group("/auth")
+	auth.POST("/login", h.Auth.Login)
+	auth.POST("/refresh", h.Auth.Refresh)
 }

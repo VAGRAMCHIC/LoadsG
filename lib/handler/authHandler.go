@@ -2,9 +2,7 @@
 package handler
 
 import (
-	"log"
-	"net/http"
-
+	"time"
 	"github.com/gin-gonic/gin"
 
 	"loadsg/lib/dto"
@@ -19,30 +17,61 @@ func NewAuthHandler(s service.AuthService) *AuthHandler {
     return &AuthHandler{service: s}
 }
 
+
 func (h *AuthHandler) Login(c *gin.Context) {
-    var req dto.LoginRequest
-    if err := c.ShouldBindJSON(&req); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{
-            "error": "invalid request body",
-        })
-        return
-    }
+	var req dto.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.AbortWithStatus(400)
+		return
+	}
 
-    token, refreshToken, err := h.service.Login(
-        c.Request.Context(),
-        req.UID,
-				req.TokenHash,
-    )
-    if err != nil {
-				log.Printf("\nerror: %s", err.Error())
-        c.JSON(http.StatusUnauthorized, gin.H{
-            "error": "invalid id or token",
-        })
-        return
-    }
+	pair, err := h.service.Login(
+		c.Request.Context(),
+		req.UID,
+		req.TokenHash,
+	)
+	if err != nil {
+		c.AbortWithStatus(401)
+		return
+	}
 
-    c.JSON(http.StatusOK, dto.LoginResponse{
-        AccessToken: token, RefreshToken: refreshToken,
-    })
+	setRefreshCookie(c, pair.RefreshToken, pair.RefreshExp)
+
+	c.JSON(200, gin.H{
+		"access_token": pair.AccessToken,
+	})
 }
 
+
+func (h *AuthHandler) Refresh(c *gin.Context) {
+	refresh, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.AbortWithStatus(401)
+		return
+	}
+
+	pair, err := h.service.Refresh(c.Request.Context(), refresh)
+	if err != nil {
+		c.AbortWithStatus(401)
+		return
+	}
+
+	setRefreshCookie(c, pair.RefreshToken, pair.RefreshExp)
+
+	c.JSON(200, gin.H{
+		"access_token": pair.AccessToken,
+	})
+}
+
+
+func setRefreshCookie(c *gin.Context, token string, exp time.Time) {
+	c.SetCookie(
+		"refresh_token",
+		token,
+		int(time.Until(exp).Seconds()),
+		"/",
+		"",
+		true,  // Secure
+		true,  // HttpOnly
+	)
+}

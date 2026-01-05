@@ -6,9 +6,10 @@ import (
 	"loadsg/lib/model"
 	"loadsg/lib/repository"
 	"log"
-
+	"time"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
 
 
 type JWTRefreshRepository struct{
@@ -39,4 +40,43 @@ func (r *JWTRefreshRepository) Create(ctx context.Context, jwt *model.JWTRefresh
 		log.Fatalf("Insert data error: %s", err)
 	}
 	return jwt, nil
+}
+
+
+
+func (r *JWTRefreshRepository) Save(ctx context.Context, userID string,
+	hash string, expires time.Time,
+) error {
+	_, err := r.db.Exec(ctx, `
+		INSERT INTO refresh_tokens (user_uid, token_hash, expires_at)
+		VALUES ($1, $2, $3)
+	`, userID, hash, expires)
+	return err
+}
+
+func (r *JWTRefreshRepository) Get(ctx context.Context, hash string) (string, error) {
+	var uid string
+	err := r.db.QueryRow(ctx, `
+		SELECT user_uid FROM refresh_tokens
+		WHERE token_hash = $1
+	`, hash).Scan(&uid)
+	return uid, err
+}
+
+
+
+
+func (r *JWTRefreshRepository) Delete(ctx context.Context, jwtHash string) error{
+	cmd, err := r.db.Exec(context.Background(),
+		"DELETE FROM refresh_tokens WHERE token_hash=$1", jwtHash)
+	if err != nil {
+		log.Fatalf("Delete data error: %s", err)
+		return err
+	}
+
+	if cmd.RowsAffected() == 0 {
+		return nil
+	}
+
+	return nil
 }
