@@ -49,8 +49,9 @@ func (r *UserRepository) Create(ctx context.Context, user *model.User) (*model.U
 			"INSERT INTO users (token_hash) VALUES ($1) RETURNING uid", user.Token).Scan(&user.UID)
 		if err != nil {
 			log.Fatalf("Insert data error: %s", err.Error())
+			return user, err
 		}
-		return user, err
+		return user, nil
 	}
 	
 	err := r.db.QueryRow(context.Background(),
@@ -58,9 +59,10 @@ func (r *UserRepository) Create(ctx context.Context, user *model.User) (*model.U
 	log.Print(user)
 	if err != nil {
 		log.Fatalf("Insert data error: %s", err.Error())
+		return user, err
 	}
 	
-	return user, err
+	return user, nil
 }
 
 
