@@ -15,6 +15,7 @@ func RegisterRoutes(
 	v1 := r.Group("/v1")
 	registerAuth(v1, h)
 	registerUserPrivate(v1, h, s)
+	registerLoadManagerPrivate(v1, h, s)
 }
 
 

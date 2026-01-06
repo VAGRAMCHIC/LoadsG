@@ -14,12 +14,12 @@ type LoadJob struct{
 var DB_TABLE_LOAD_JOB = DB_TABLE{
 	Name: "load_job",
 	Params: map[string]string{
-		"id":       	"UUID NOT NULL",
+		"id":		      "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
 		"job_name": 	"TEXT NOT NULL",
 		"type":				"TEXT NOT NULL",
 		"start_time": "TIMESTAMPTZ",
 	},
-	PrimaryKey: []string{"id"},
+	InlinePrimaryKey: true,
 }
 
 

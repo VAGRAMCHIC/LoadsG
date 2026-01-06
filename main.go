@@ -43,12 +43,15 @@ func main() {
 
 	userRepo := postgres.NewUserRepository(dbpool)
 	jwtRepo := postgres.NewJWTRefreshRepository(dbpool)
+	loadJobRepo := postgres.NewLoadRepository(dbpool)
+	httpLoadRepo := postgres.NewHttpLoadRepository(dbpool)
 
 	jwtManager := security.NewJWTManager(config.JwtKey, config.JwtRefreshKey, config.AppName, 300)
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(userRepo, jwtRepo, *jwtManager)
-	
-	handler := handler.NewHandler(userService, authService)
+	loadManagerService := service.NewLoadManagerService(loadJobRepo, httpLoadRepo)
+
+	handler := handler.NewHandler(userService, authService, loadManagerService)
 
 	
 	router.RegisterRoutes(r, handler, jwtManager)

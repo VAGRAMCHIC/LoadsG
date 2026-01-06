@@ -20,7 +20,7 @@ var DB_TABLE_FIXED_HTTP_LOAD = DB_TABLE{
 	InlinePrimaryKey: true,
 	ForeignKeys: []ForeignKey{
 		{
-			Column: "load_job_id",
+			Column: "_id",
 			RefTable:"load_job",
 			RefColumn: "id",
 			OnDelete: "CASCADE",
