@@ -9,4 +9,6 @@ import (
 type LoadManagerService interface {
 	CreateFixedHTTPLoadJob(ctx context.Context, 
 		loadJob dto.CreateFixedHTTPLoadRequest) (job *model.LoadJob, err error)
+	DeleteFixedHTTPLoadJob(ctx context.Context, loadJobId string) (id string, err error)
+	
 }

@@ -42,3 +42,7 @@ curl -i -X POST http://localhost:8080/v1/http-load/fixed \
       "body": "{}"
     }
   }'
+
+#### Delete fixed load
+curl -i -X DELETE http://localhost:8080/v1/manager/http/fixed/cbdd89c0-52d9-4c7f-b5bb-2b0045a01261 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.XXX.YYY"

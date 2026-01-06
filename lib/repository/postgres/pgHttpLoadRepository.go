@@ -39,3 +39,12 @@ func (r *HttpLoadRepository) CreateFixed(ctx context.Context, httpLoad *model.Fi
 	}
 	return httpLoad, nil
 }
+
+func (r *HttpLoadRepository) DeleteFixed(ctx context.Context, id string) error{
+	_, err := r.db.Exec(ctx, `DELETE FROM fixed_http_load WHERE id=$1`, id)	
+	if err != nil {
+		log.Printf("cant delete load job: %s", err)
+		return err
+	}
+	return nil
+}

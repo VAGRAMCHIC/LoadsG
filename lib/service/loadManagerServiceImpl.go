@@ -55,3 +55,20 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 	}
 	return lj, nil
 }
+
+func (s *loadManagerService) DeleteFixedHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
+	log.Printf("load job id: %s", loadJobId)
+
+	fJob, err:= s.lrepo.GetById(ctx, loadJobId)
+	if err!= nil{
+		log.Printf("cant find job: %s", err)
+		return  fJob.Id, err
+	}
+	err = s.lrepo.Delete(ctx, fJob.Id)
+	if err != nil {
+		log.Printf("cant delete job: %s", err)
+		return  fJob.Id, err
+	}
+	return fJob.Id, nil
+}
+

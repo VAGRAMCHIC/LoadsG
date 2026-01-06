@@ -19,5 +19,6 @@ func registerLoadManagerPrivate(
 	
 	lF := lM.Group("/http")
 
-	lF.POST("/create-fixed", h.Load.CreateFixedHttp)
+	lF.POST("/fixed", h.Load.CreateFixedHttp)
+	lF.DELETE("/fixed/:id", h.Load.DeleteFixedHttp )
 }

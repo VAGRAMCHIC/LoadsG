@@ -10,6 +10,13 @@ type CreateFixedHTTPLoadRequest struct {
 
 type CreateFixedHTTPLoadResponse struct {
 	JobID	string	`json:"id" binding:"required"`
+}
 
+type DeleteLoadJobRequest struct {
+	JobID string `json:"id" binding:"required"`
+}
+
+type DeleteLoadJobResponse struct {
+	JobID 	string `json:"id" binding:"required"`
 }
  
