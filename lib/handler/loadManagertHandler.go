@@ -27,7 +27,7 @@ func (h *LoadManagerHandler) CreateFixedHttp(c *gin.Context) {
 		req,
 	)
 	if err != nil {
-		c.AbortWithStatus(401)
+		c.AbortWithStatus(500)
 		return
 	}
 	c.JSON(200, gin.H{
@@ -36,13 +36,6 @@ func (h *LoadManagerHandler) CreateFixedHttp(c *gin.Context) {
 }
 
 func (h *LoadManagerHandler) DeleteFixedHttp(c *gin.Context) {
-	//var req dto.DeleteLoadJobRequest
-
-	//if err:= c.ShouldBindJSON(&req);err != nil {
-	//	c.AbortWithStatus(400)
-	//	return
-	//}
-
 	Id := c.Param("id")
 	if Id == "" {
 		c.JSON(400, gin.H{"error": "id is required"})
@@ -58,5 +51,80 @@ func (h *LoadManagerHandler) DeleteFixedHttp(c *gin.Context) {
 		return
 	}
 	c.JSON(204, resp)
+}
 
+func (h *LoadManagerHandler) CreateConstantHttp(c *gin.Context) {
+	var req dto.CreateConstantHTTPLoadRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.AbortWithStatus(400)
+		return
+	}
+
+	loadJob, err := h.service.CreateConstantHTTPLoadJob(
+		c.Request.Context(),
+		req,
+	)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	c.JSON(200, gin.H{
+		"job_id": loadJob.Id,
+	})
+}
+
+func (h *LoadManagerHandler) DeleteConstantHttp(c *gin.Context) {
+	Id := c.Param("id")
+	if Id == "" {
+		c.JSON(400, gin.H{"error": "id is required"})
+	}
+	var resp dto.DeleteLoadJobResponse
+	var err error
+	resp.JobID, err = h.service.DeleteFixedHTTPLoadJob(
+		c.Request.Context(),
+		Id,
+	)
+	if err != nil {
+		c.AbortWithStatus(401)
+		return
+	}
+	c.JSON(204, resp)
+}
+
+func (h *LoadManagerHandler) CreateRampUpHttp(c *gin.Context) {
+	var req dto.CreateRampUpHTTPLoadRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.AbortWithStatus(400)
+		return
+	}
+
+	loadJob, err := h.service.CreateRampUpHTTPLoadJob(
+		c.Request.Context(),
+		req,
+	)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	c.JSON(200, gin.H{
+		"job_id": loadJob.Id,
+	})
+}
+
+func (h *LoadManagerHandler) DeleteRampUpHttp(c *gin.Context) {
+	Id := c.Param("id")
+	if Id == "" {
+		c.JSON(400, gin.H{"error": "id is required"})
+	}
+	var resp dto.DeleteLoadJobResponse
+	var err error
+	resp.JobID, err = h.service.DeleteRampUpHTTPLoadJob(
+		c.Request.Context(),
+		Id,
+	)
+	if err != nil {
+		c.AbortWithStatus(401)
+		return
+	}
+	c.JSON(204, resp)
 }

@@ -18,6 +18,8 @@ func InitDB(ctx context.Context, pool *pgxpool.Pool) error {
 		model.DB_TABLE_JWTTOKENS,
 		model.DB_TABLE_LOAD_JOB,
 		model.DB_TABLE_FIXED_HTTP_LOAD,
+		model.DB_TABLE_CONSTANT_HTTP_LOAD,
+		model.DB_TABLE_RAMPUP_HTTP_LOAD,
 	}
 
 	for _, table := range tables {

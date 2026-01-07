@@ -20,17 +20,17 @@ func NewHttpLoadRepository(db *pgxpool.Pool) repository.HttpLoadRepository {
 }
 
 func (r *HttpLoadRepository) GetFixedById(ctx context.Context, id string) (*model.FixedHttpLoad, error) {
-	var httoLoad model.FixedHttpLoad
-	err := r.db.QueryRow(context.Background(), "SELECT id, load_job_id, request_count, payload FROM fixed_http_load where id=$1").Scan(&httoLoad.Id, &httoLoad.LoadJobId, &httoLoad.RequestCount, &httoLoad.Payload)
+	var httpLoad model.FixedHttpLoad
+	err := r.db.QueryRow(context.Background(), "SELECT load_job_id, rps, duration, payload FROM fixed_http_load where load_job_id=$1").Scan(&httpLoad.LoadJobId, &httpLoad.RPS, &httpLoad.Duration, &httpLoad.Payload)
 	if err != nil {
 		log.Printf("cant get load job by id: %s", err)
-		return &httoLoad, err
+		return &httpLoad, err
 	}
-	return &httoLoad, nil
+	return &httpLoad, nil
 }
 
 func (r *HttpLoadRepository) CreateFixed(ctx context.Context, httpLoad *model.FixedHttpLoad) (*model.FixedHttpLoad, error) {
-	err := r.db.QueryRow(context.Background(), "INSERT INTO fixed_http_load (load_job_id, request_count, payload) VALUES ($1, $2, $3) RETURNING id, load_job_id, request_count", httpLoad.LoadJobId, httpLoad.RequestCount, httpLoad.Payload).Scan(&httpLoad.Id, &httpLoad.LoadJobId, &httpLoad.RequestCount)
+	err := r.db.QueryRow(context.Background(), "INSERT INTO fixed_http_load (load_job_id, rps, duration, payload) VALUES ($1, $2, $3, $4) RETURNING load_job_id, rps, duration", httpLoad.LoadJobId, httpLoad.RPS, httpLoad.Duration, httpLoad.Payload).Scan(&httpLoad.LoadJobId, &httpLoad.RPS, &httpLoad.Duration)
 	if err != nil {
 		log.Printf("cant create load job: %s", err)
 		return httpLoad, err
@@ -39,7 +39,63 @@ func (r *HttpLoadRepository) CreateFixed(ctx context.Context, httpLoad *model.Fi
 }
 
 func (r *HttpLoadRepository) DeleteFixed(ctx context.Context, id string) error {
-	_, err := r.db.Exec(ctx, `DELETE FROM fixed_http_load WHERE id=$1`, id)
+	_, err := r.db.Exec(ctx, `DELETE FROM fixed_http_load WHERE load_job_id=$1`, id)
+	if err != nil {
+		log.Printf("cant delete load job: %s", err)
+		return err
+	}
+	return nil
+}
+
+func (r *HttpLoadRepository) GetConstantById(ctx context.Context, id string) (*model.ConstantHttpLoad, error) {
+	var httpLoad model.ConstantHttpLoad
+	err := r.db.QueryRow(context.Background(), "SELECT load_job_id, count, payload FROM constant_http_load where load_job_id=$1").Scan(&httpLoad.LoadJobId, &httpLoad.Count, &httpLoad.Payload)
+	if err != nil {
+		log.Printf("cant get load job by id: %s", err)
+		return &httpLoad, err
+	}
+	return &httpLoad, nil
+}
+
+func (r *HttpLoadRepository) CreateConstant(ctx context.Context, httpLoad *model.ConstantHttpLoad) (*model.ConstantHttpLoad, error) {
+	err := r.db.QueryRow(context.Background(), "INSERT INTO constant_http_load (load_job_id, count, payload) VALUES ($1, $2, $3) RETURNING load_job_id, count", httpLoad.LoadJobId, httpLoad.Count, httpLoad.Payload).Scan(&httpLoad.LoadJobId, &httpLoad.Count)
+	if err != nil {
+		log.Printf("cant create load job: %s", err)
+		return httpLoad, err
+	}
+	return httpLoad, nil
+}
+
+func (r *HttpLoadRepository) DeleteConstant(ctx context.Context, id string) error {
+	_, err := r.db.Exec(ctx, `DELETE FROM constant_http_load WHERE load_job_id=$1`, id)
+	if err != nil {
+		log.Printf("cant delete load job: %s", err)
+		return err
+	}
+	return nil
+}
+
+func (r *HttpLoadRepository) GetRampUpById(ctx context.Context, id string) (*model.RampUpHttpLoad, error) {
+	var httpLoad model.RampUpHttpLoad
+	err := r.db.QueryRow(context.Background(), "SELECT load_job_id, rps_s, rps_f, duration, payload FROM ramp_up_http_load where load_job_id=$1").Scan(&httpLoad.LoadJobId, &httpLoad.RPS_S, &httpLoad.RPS_F, &httpLoad.Duration, &httpLoad.Payload)
+	if err != nil {
+		log.Printf("cant get load job by id: %s", err)
+		return &httpLoad, err
+	}
+	return &httpLoad, nil
+}
+
+func (r *HttpLoadRepository) CreateRampUp(ctx context.Context, httpLoad *model.RampUpHttpLoad) (*model.RampUpHttpLoad, error) {
+	err := r.db.QueryRow(context.Background(), "INSERT INTO ramp_up_http_load (load_job_id, rps_s, rps_f, duration, payload) VALUES ($1, $2, $3, $4, $5) RETURNING load_job_id, rps_s, rps_f", httpLoad.LoadJobId, httpLoad.RPS_S, httpLoad.RPS_F, httpLoad.Duration, httpLoad.Payload).Scan(&httpLoad.LoadJobId, &httpLoad.RPS_S, &httpLoad.RPS_F)
+	if err != nil {
+		log.Printf("cant create load job: %s", err)
+		return httpLoad, err
+	}
+	return httpLoad, nil
+}
+
+func (r *HttpLoadRepository) DeleteRampUp(ctx context.Context, id string) error {
+	_, err := r.db.Exec(ctx, `DELETE FROM ramp_up_http_load WHERE load_job_id=$1`, id)
 	if err != nil {
 		log.Printf("cant delete load job: %s", err)
 		return err

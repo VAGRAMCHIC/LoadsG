@@ -26,7 +26,8 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 	if err != nil {
 		log.Printf("cant read date: %s", err)
 	}
-	requestCount, err := strconv.Atoi(req.RequestCount)
+	rps, err := strconv.Atoi(req.RPS)
+	duration, err := strconv.ParseFloat(req.Duration, 32)
 	if err != nil {
 		log.Printf("cant read request count: %s", err)
 	}
@@ -43,9 +44,10 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 	}
 
 	fixedHttpload := &model.FixedHttpLoad{
-		LoadJobId:    lj.Id,
-		Payload:      req.Payload,
-		RequestCount: requestCount,
+		LoadJobId: lj.Id,
+		Payload:   req.Payload,
+		RPS:       rps,
+		Duration:  float32(duration),
 	}
 	hl, err := s.hrepo.CreateFixed(ctx, fixedHttpload)
 	if err != nil {
@@ -57,6 +59,114 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 }
 
 func (s *loadManagerService) DeleteFixedHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
+	log.Printf("load job id: %s", loadJobId)
+
+	fJob, err := s.lrepo.GetById(ctx, loadJobId)
+	if err != nil {
+		log.Printf("cant find job: %s", err)
+		return fJob.Id, err
+	}
+	err = s.lrepo.Delete(ctx, fJob.Id)
+	if err != nil {
+		log.Printf("cant delete job: %s", err)
+		return fJob.Id, err
+	}
+	return fJob.Id, nil
+}
+
+func (s *loadManagerService) CreateConstantHTTPLoadJob(ctx context.Context,
+	req dto.CreateConstantHTTPLoadRequest) (*model.LoadJob, error) {
+
+	startTime, err := time.Parse(time.RFC3339, req.StartTime)
+	if err != nil {
+		log.Printf("cant read date: %s", err)
+	}
+	count, err := strconv.Atoi(req.Count)
+	if err != nil {
+		log.Printf("cant read request count: %s", err)
+	}
+
+	loadJob := &model.LoadJob{
+		JobName:   req.JobName,
+		Type:      req.Type,
+		StartTime: startTime,
+	}
+
+	lj, err := s.lrepo.Create(ctx, loadJob)
+	if err != nil {
+		log.Printf("cant create loadJob: %s", err)
+	}
+
+	constantHttpload := &model.ConstantHttpLoad{
+		LoadJobId: lj.Id,
+		Payload:   req.Payload,
+		Count:     count,
+	}
+	hl, err := s.hrepo.CreateConstant(ctx, constantHttpload)
+	if err != nil {
+		log.Printf("cant create http load: %s", err)
+		log.Print(hl)
+		return lj, err
+	}
+	return lj, nil
+}
+
+func (s *loadManagerService) DeleteConstantHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
+	log.Printf("load job id: %s", loadJobId)
+
+	fJob, err := s.lrepo.GetById(ctx, loadJobId)
+	if err != nil {
+		log.Printf("cant find job: %s", err)
+		return fJob.Id, err
+	}
+	err = s.lrepo.Delete(ctx, fJob.Id)
+	if err != nil {
+		log.Printf("cant delete job: %s", err)
+		return fJob.Id, err
+	}
+	return fJob.Id, nil
+}
+
+func (s *loadManagerService) CreateRampUpHTTPLoadJob(ctx context.Context,
+	req dto.CreateRampUpHTTPLoadRequest) (*model.LoadJob, error) {
+
+	startTime, err := time.Parse(time.RFC3339, req.StartTime)
+	if err != nil {
+		log.Printf("cant read date: %s", err)
+	}
+	rps_s, err := strconv.Atoi(req.RPS_S)
+	rps_f, err := strconv.Atoi(req.RPS_F)
+	if err != nil {
+		log.Printf("cant read request count: %s", err)
+	}
+
+	loadJob := &model.LoadJob{
+		JobName:   req.JobName,
+		Type:      req.Type,
+		StartTime: startTime,
+	}
+
+	lj, err := s.lrepo.Create(ctx, loadJob)
+	if err != nil {
+		log.Printf("cant create loadJob: %s", err)
+	}
+
+	rampUpHttpload := &model.RampUpHttpLoad{
+		LoadJobId: lj.Id,
+		Payload:   req.Payload,
+		RPS_S:     rps_s,
+		RPS_F:     rps_f,
+	}
+	hl, err := s.hrepo.CreateRampUp(ctx, rampUpHttpload)
+	if err != nil {
+		log.Printf("cant create http load: %s", err)
+		log.Print(hl)
+		return lj, err
+	}
+	return lj, nil
+}
+
+func (s *loadManagerService) DeleteRampUpHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
 	log.Printf("load job id: %s", loadJobId)
 
 	fJob, err := s.lrepo.GetById(ctx, loadJobId)
