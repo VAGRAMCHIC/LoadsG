@@ -2,9 +2,10 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
-	"loadsg/lib/security"
 	"loadsg/lib/handler"
+	"loadsg/lib/security"
+
+	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(
@@ -17,6 +18,3 @@ func RegisterRoutes(
 	registerUserPrivate(v1, h, s)
 	registerLoadManagerPrivate(v1, h, s)
 }
-
-
-

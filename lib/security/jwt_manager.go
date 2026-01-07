@@ -16,13 +16,11 @@ type TokenPair struct {
 	RefreshExp   time.Time
 }
 
-
-
 type JWTManager struct {
-	secret []byte
+	secret        []byte
 	refreshSecret []byte
-	issuer string
-	expires_at int64
+	issuer        string
+	expires_at    int64
 }
 
 type Claims struct {
@@ -30,12 +28,9 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-
-
 func NewJWTManager(secret, refreshSecret, issuer string, expires_at int64) *JWTManager {
 	return &JWTManager{secret: []byte(secret), refreshSecret: []byte(refreshSecret), issuer: issuer, expires_at: expires_at}
 }
-
 
 func (j *JWTManager) GeneratePair(userID string) (*TokenPair, error) {
 	accessExp := time.Now().Add(15 * time.Minute)
@@ -68,7 +63,6 @@ func (j *JWTManager) GeneratePair(userID string) (*TokenPair, error) {
 	}, nil
 }
 
-
 func (j *JWTManager) Generate(userID string) (string, time.Time, error) {
 	expiresAt := time.Now().Add(time.Duration(j.expires_at))
 
@@ -88,8 +82,6 @@ func (j *JWTManager) Generate(userID string) (string, time.Time, error) {
 
 	return signed, expiresAt, nil
 }
-
-
 
 func (j *JWTManager) GenerateRefresh(
 	userID string,
@@ -113,7 +105,6 @@ func (j *JWTManager) GenerateRefresh(
 
 	return signed, expiresAt, nil
 }
-
 
 func (j *JWTManager) ValidateRefresh(
 	tokenString string,
@@ -142,7 +133,6 @@ func (j *JWTManager) ValidateRefresh(
 
 	return claims, nil
 }
-
 
 func (j *JWTManager) Validate(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(
@@ -173,6 +163,3 @@ func HashToken(token string) string {
 	sum := sha256.Sum256([]byte(token))
 	return hex.EncodeToString(sum[:])
 }
-
-
-

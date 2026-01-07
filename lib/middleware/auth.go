@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"strings"
 	"loadsg/lib/security"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 )
-
 
 // internal/middleware/auth.go
 func AuthRequired(jwtManager *security.JWTManager) gin.HandlerFunc {
@@ -30,5 +30,3 @@ func AuthRequired(jwtManager *security.JWTManager) gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-

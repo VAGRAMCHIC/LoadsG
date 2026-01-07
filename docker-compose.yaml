@@ -12,7 +12,7 @@ services:
       PG_CONN: "postgres://testuser:testpassword@db:5432/loadsg"
       MAX_CONCURRENT: 10
       JWT_KEY: OoGael1eiVeighoo3eighoh9ze8mewosvveER
-      APP_NAME: load_gen 
+      APP_NAME: load_gen
       JWT_REFRESH_KEY: sdacsfwfwewuikuntgmyu674y3ervbnmyu5cscsdvfgrtyyk676623
       ROOT_TOKEN: a12345678
       ROOT_USER: root

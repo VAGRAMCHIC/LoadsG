@@ -10,30 +10,30 @@ import (
 	"time"
 )
 
-type loadManagerService struct{
+type loadManagerService struct {
 	lrepo repository.LoadRepository
 	hrepo repository.HttpLoadRepository
 }
 
 func NewLoadManagerService(lr repository.LoadRepository, hr repository.HttpLoadRepository) *loadManagerService {
-	return  &loadManagerService{lrepo: lr, hrepo: hr}
+	return &loadManagerService{lrepo: lr, hrepo: hr}
 }
 
-func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context, 
-	req dto.CreateFixedHTTPLoadRequest) (*model.LoadJob, error){
-	
-	startTime, err:= time.Parse(time.RFC3339, req.StartTime)
-  if err != nil {
-		log.Printf("cant read date: %s",err)
-	}
-	requestCount, err:= strconv.Atoi(req.RequestCount)
+func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
+	req dto.CreateFixedHTTPLoadRequest) (*model.LoadJob, error) {
+
+	startTime, err := time.Parse(time.RFC3339, req.StartTime)
 	if err != nil {
-		log.Printf("cant read request count: %s",err)
+		log.Printf("cant read date: %s", err)
+	}
+	requestCount, err := strconv.Atoi(req.RequestCount)
+	if err != nil {
+		log.Printf("cant read request count: %s", err)
 	}
 
 	loadJob := &model.LoadJob{
-		JobName: req.JobName,
-		Type: req.Type,
+		JobName:   req.JobName,
+		Type:      req.Type,
 		StartTime: startTime,
 	}
 
@@ -43,12 +43,12 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 	}
 
 	fixedHttpload := &model.FixedHttpLoad{
-		LoadJobId: lj.Id,
-		Payload: req.Payload,
+		LoadJobId:    lj.Id,
+		Payload:      req.Payload,
 		RequestCount: requestCount,
 	}
 	hl, err := s.hrepo.CreateFixed(ctx, fixedHttpload)
-	if err != nil{
+	if err != nil {
 		log.Printf("cant create http load: %s", err)
 		log.Print(hl)
 		return lj, err
@@ -59,16 +59,15 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 func (s *loadManagerService) DeleteFixedHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
 	log.Printf("load job id: %s", loadJobId)
 
-	fJob, err:= s.lrepo.GetById(ctx, loadJobId)
-	if err!= nil{
+	fJob, err := s.lrepo.GetById(ctx, loadJobId)
+	if err != nil {
 		log.Printf("cant find job: %s", err)
-		return  fJob.Id, err
+		return fJob.Id, err
 	}
 	err = s.lrepo.Delete(ctx, fJob.Id)
 	if err != nil {
 		log.Printf("cant delete job: %s", err)
-		return  fJob.Id, err
+		return fJob.Id, err
 	}
 	return fJob.Id, nil
 }
-

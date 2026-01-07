@@ -12,13 +12,13 @@ func registerLoadManagerPrivate(
 	r *gin.RouterGroup,
 	h *handler.Handler,
 	s *security.JWTManager,
-){
-	lM:= r.Group("/manager")
-	
+) {
+	lM := r.Group("/manager")
+
 	lM.Use(middleware.AuthRequired(s))
-	
+
 	lF := lM.Group("/http")
 
 	lF.POST("/fixed", h.Load.CreateFixedHttp)
-	lF.DELETE("/fixed/:id", h.Load.DeleteFixedHttp )
+	lF.DELETE("/fixed/:id", h.Load.DeleteFixedHttp)
 }

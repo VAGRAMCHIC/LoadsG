@@ -3,9 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"time"
 	model "loadsg/lib/model"
-
+	"time"
 )
 
 var ErrJWTRefreshNotFound = errors.New("jwt refresh token not found")
@@ -17,5 +16,3 @@ type JWTRefreshRepository interface {
 	Get(ctx context.Context, hash string) (string, error) // userID
 	Save(ctx context.Context, userID string, hash string, expiresAt time.Time) error
 }
-
-

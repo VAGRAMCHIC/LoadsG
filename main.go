@@ -25,10 +25,9 @@ func main() {
 		fmt.Println("Ошибка загрузки конфигурации:", err)
 		return
 	}
-	
-	ctx:= context.Background()
 
-	
+	ctx := context.Background()
+
 	dbpool, err := lib.InitPool(ctx, config.PgConn)
 	if err != nil {
 		log.Fatal(err)
@@ -53,17 +52,16 @@ func main() {
 
 	handler := handler.NewHandler(userService, authService, loadManagerService)
 
-	
 	router.RegisterRoutes(r, handler, jwtManager)
 	log.Print("test\n")
-	rootUser, err:= userRepo.GetByComment(ctx, config.RootUser)
+	rootUser, err := userRepo.GetByComment(ctx, config.RootUser)
 	log.Print(rootUser)
-	if err!= nil {
+	if err != nil {
 		var createUser dto.CreateUserRequest
 		createUser.Comment = config.RootUser
 		createUser.Token = config.RootToken
-		_, err:= userService.Create(ctx, createUser)
-		if err != nil{
+		_, err := userService.Create(ctx, createUser)
+		if err != nil {
 			log.Fatalf("cant create root user: %s", err)
 		}
 	}

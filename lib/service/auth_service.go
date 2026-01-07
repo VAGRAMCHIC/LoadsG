@@ -6,7 +6,6 @@ import (
 )
 
 type AuthService interface {
-    Login(ctx context.Context, uid string, password string) (pair *security.TokenPair, err error)
-		Refresh(ctx context.Context, refreshToken string) (pair *security.TokenPair, err error)
+	Login(ctx context.Context, uid string, password string) (pair *security.TokenPair, err error)
+	Refresh(ctx context.Context, refreshToken string) (pair *security.TokenPair, err error)
 }
-

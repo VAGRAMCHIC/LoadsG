@@ -2,15 +2,15 @@ package lib
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
 	"sort"
 	"strings"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"loadsg/lib/model"
 )
-
 
 func InitDB(ctx context.Context, pool *pgxpool.Pool) error {
 	tables := []model.DB_TABLE{
@@ -27,7 +27,6 @@ func InitDB(ctx context.Context, pool *pgxpool.Pool) error {
 	}
 	return nil
 }
-
 
 func initTable(
 	ctx context.Context,
@@ -77,7 +76,6 @@ func initTable(
 	return err
 }
 
-
 func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
@@ -94,14 +92,11 @@ func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-
-
-
 // --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
 
 //func InsertHTTPLoadJob(conn *pgx.Conn, loadJob model.HTTPLoadJob) {
 //	_, err := conn.Exec(context.Background(),
-//		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)", 
+//		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)",
 //													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
 //	if err != nil {
 //		log.Fatalf("Insert data error: %s", err.Error())
@@ -109,7 +104,6 @@ func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 //	}
 //	defer conn.Close(context.Background())
 //}
-
 
 //func GetHTTPLoadJob(conn *pgx.Conn, id string) (model.HTTPLoadJob, error) {
 //	var loadJob model.HTTPLoadJob
@@ -124,5 +118,3 @@ func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 //	defer conn.Close(context.Background())
 //	return loadJob, err
 //}
-
-

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"time"
+
 	"github.com/gin-gonic/gin"
 
 	"loadsg/lib/dto"
@@ -9,13 +10,12 @@ import (
 )
 
 type AuthHandler struct {
-    service service.AuthService
+	service service.AuthService
 }
 
 func NewAuthHandler(s service.AuthService) *AuthHandler {
-    return &AuthHandler{service: s}
+	return &AuthHandler{service: s}
 }
-
 
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
@@ -41,7 +41,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
-
 func (h *AuthHandler) Refresh(c *gin.Context) {
 	refresh, err := c.Cookie("refresh_token")
 	if err != nil {
@@ -62,7 +61,6 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 	})
 }
 
-
 func setRefreshCookie(c *gin.Context, token string, exp time.Time) {
 	c.SetCookie(
 		"refresh_token",
@@ -70,7 +68,7 @@ func setRefreshCookie(c *gin.Context, token string, exp time.Time) {
 		int(time.Until(exp).Seconds()),
 		"/",
 		"",
-		true,  // Secure
-		true,  // HttpOnly
+		true, // Secure
+		true, // HttpOnly
 	)
 }

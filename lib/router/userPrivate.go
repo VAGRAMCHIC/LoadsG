@@ -18,5 +18,3 @@ func registerUserPrivate(
 
 	uR.POST("/create", h.User.Create)
 }
-
-

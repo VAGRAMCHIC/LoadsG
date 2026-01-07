@@ -18,17 +18,17 @@ var ErrUnauthorized = errors.New("Unauthorized")
 var ErrForbidden = errors.New("Forbiden")
 
 type authService struct {
-    users repository.UserRepository
-    tokens repository.JWTRefreshRepository
-		jwt    security.JWTManager
+	users  repository.UserRepository
+	tokens repository.JWTRefreshRepository
+	jwt    security.JWTManager
 }
 
 func NewAuthService(
-    users 	repository.UserRepository,
-		tokens 	repository.JWTRefreshRepository,
-    jwt 		security.JWTManager,
+	users repository.UserRepository,
+	tokens repository.JWTRefreshRepository,
+	jwt security.JWTManager,
 ) AuthService {
-    return &authService{users: users, tokens: tokens, jwt: jwt}
+	return &authService{users: users, tokens: tokens, jwt: jwt}
 }
 
 func (s *authService) Login(
@@ -73,8 +73,6 @@ func (s *authService) Login(
 	return pair, nil
 }
 
-
-
 func (s *authService) Refresh(
 	ctx context.Context,
 	refreshToken string,
@@ -118,5 +116,3 @@ func (s *authService) Refresh(
 
 	return pair, nil
 }
-
-

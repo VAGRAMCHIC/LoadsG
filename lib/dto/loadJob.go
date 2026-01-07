@@ -1,15 +1,15 @@
 package dto
 
 type CreateFixedHTTPLoadRequest struct {
-	JobName				string 						`json:"job_name" binding:"required"`
-	Type					string 						`json:"type" binding:"required"`
-	StartTime 		string 						`json:"start_time" binding:"required"`
-	RequestCount 	string						`json:"request_count" binding:"required"`
-	Payload				map[string]string `json:"payload" binding:"required"`
+	JobName      string            `json:"job_name" binding:"required"`
+	Type         string            `json:"type" binding:"required"`
+	StartTime    string            `json:"start_time" binding:"required"`
+	RequestCount string            `json:"request_count" binding:"required"`
+	Payload      map[string]string `json:"payload" binding:"required"`
 }
 
 type CreateFixedHTTPLoadResponse struct {
-	JobID	string	`json:"id" binding:"required"`
+	JobID string `json:"id" binding:"required"`
 }
 
 type DeleteLoadJobRequest struct {
@@ -17,6 +17,5 @@ type DeleteLoadJobRequest struct {
 }
 
 type DeleteLoadJobResponse struct {
-	JobID 	string `json:"id" binding:"required"`
+	JobID string `json:"id" binding:"required"`
 }
- 
