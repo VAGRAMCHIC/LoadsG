@@ -58,22 +58,6 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 	return lj, nil
 }
 
-func (s *loadManagerService) DeleteFixedHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
-	log.Printf("load job id: %s", loadJobId)
-
-	fJob, err := s.lrepo.GetById(ctx, loadJobId)
-	if err != nil {
-		log.Printf("cant find job: %s", err)
-		return fJob.Id, err
-	}
-	err = s.lrepo.Delete(ctx, fJob.Id)
-	if err != nil {
-		log.Printf("cant delete job: %s", err)
-		return fJob.Id, err
-	}
-	return fJob.Id, nil
-}
-
 func (s *loadManagerService) CreateConstantHTTPLoadJob(ctx context.Context,
 	req dto.CreateConstantHTTPLoadRequest) (*model.LoadJob, error) {
 
@@ -109,22 +93,6 @@ func (s *loadManagerService) CreateConstantHTTPLoadJob(ctx context.Context,
 		return lj, err
 	}
 	return lj, nil
-}
-
-func (s *loadManagerService) DeleteConstantHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
-	log.Printf("load job id: %s", loadJobId)
-
-	fJob, err := s.lrepo.GetById(ctx, loadJobId)
-	if err != nil {
-		log.Printf("cant find job: %s", err)
-		return fJob.Id, err
-	}
-	err = s.lrepo.Delete(ctx, fJob.Id)
-	if err != nil {
-		log.Printf("cant delete job: %s", err)
-		return fJob.Id, err
-	}
-	return fJob.Id, nil
 }
 
 func (s *loadManagerService) CreateRampUpHTTPLoadJob(ctx context.Context,
@@ -166,7 +134,7 @@ func (s *loadManagerService) CreateRampUpHTTPLoadJob(ctx context.Context,
 	return lj, nil
 }
 
-func (s *loadManagerService) DeleteRampUpHTTPLoadJob(ctx context.Context, loadJobId string) (string, error) {
+func (s *loadManagerService) DeleteLoadJob(ctx context.Context, loadJobId string) (string, error) {
 	log.Printf("load job id: %s", loadJobId)
 
 	fJob, err := s.lrepo.GetById(ctx, loadJobId)

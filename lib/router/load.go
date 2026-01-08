@@ -20,11 +20,11 @@ func registerLoadManagerPrivate(
 	lF := lM.Group("/http")
 
 	lF.POST("/fixed", h.Load.CreateFixedHttp)
-	lF.DELETE("/fixed/:id", h.Load.DeleteFixedHttp)
+	lF.DELETE("/fixed/:id", h.Load.DeleteLoadJob)
 
 	lF.POST("/constant", h.Load.CreateConstantHttp)
-	lF.DELETE("/constant/:id", h.Load.DeleteConstantHttp)
+	lF.DELETE("/constant/:id", h.Load.DeleteLoadJob)
 
 	lF.POST("/ramp-up", h.Load.CreateRampUpHttp)
-	lF.DELETE("/ramp-up/:id", h.Load.DeleteRampUpHttp)
+	lF.DELETE("/ramp-up/:id", h.Load.DeleteLoadJob)
 }

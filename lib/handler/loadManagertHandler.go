@@ -35,24 +35,6 @@ func (h *LoadManagerHandler) CreateFixedHttp(c *gin.Context) {
 	})
 }
 
-func (h *LoadManagerHandler) DeleteFixedHttp(c *gin.Context) {
-	Id := c.Param("id")
-	if Id == "" {
-		c.JSON(400, gin.H{"error": "id is required"})
-	}
-	var resp dto.DeleteLoadJobResponse
-	var err error
-	resp.JobID, err = h.service.DeleteFixedHTTPLoadJob(
-		c.Request.Context(),
-		Id,
-	)
-	if err != nil {
-		c.AbortWithStatus(401)
-		return
-	}
-	c.JSON(204, resp)
-}
-
 func (h *LoadManagerHandler) CreateConstantHttp(c *gin.Context) {
 	var req dto.CreateConstantHTTPLoadRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -71,24 +53,6 @@ func (h *LoadManagerHandler) CreateConstantHttp(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"job_id": loadJob.Id,
 	})
-}
-
-func (h *LoadManagerHandler) DeleteConstantHttp(c *gin.Context) {
-	Id := c.Param("id")
-	if Id == "" {
-		c.JSON(400, gin.H{"error": "id is required"})
-	}
-	var resp dto.DeleteLoadJobResponse
-	var err error
-	resp.JobID, err = h.service.DeleteFixedHTTPLoadJob(
-		c.Request.Context(),
-		Id,
-	)
-	if err != nil {
-		c.AbortWithStatus(401)
-		return
-	}
-	c.JSON(204, resp)
 }
 
 func (h *LoadManagerHandler) CreateRampUpHttp(c *gin.Context) {
@@ -111,14 +75,14 @@ func (h *LoadManagerHandler) CreateRampUpHttp(c *gin.Context) {
 	})
 }
 
-func (h *LoadManagerHandler) DeleteRampUpHttp(c *gin.Context) {
+func (h *LoadManagerHandler) DeleteLoadJob(c *gin.Context) {
 	Id := c.Param("id")
 	if Id == "" {
 		c.JSON(400, gin.H{"error": "id is required"})
 	}
 	var resp dto.DeleteLoadJobResponse
 	var err error
-	resp.JobID, err = h.service.DeleteRampUpHTTPLoadJob(
+	resp.JobID, err = h.service.DeleteLoadJob(
 		c.Request.Context(),
 		Id,
 	)
