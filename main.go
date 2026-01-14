@@ -5,16 +5,27 @@ import (
 	"fmt"
 	"loadsg/lib"
 	"loadsg/lib/dto"
+	"loadsg/lib/generators"
 	"loadsg/lib/handler"
+	"loadsg/lib/model"
 	"loadsg/lib/repository/postgres"
 	"loadsg/lib/router"
+	"loadsg/lib/scheduler"
 	"loadsg/lib/security"
 	"loadsg/lib/service"
 	"loadsg/utils"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+func handleLoadJob(ctx context.Context, job model.LoadJob) error {
+	// здесь может быть генератор нагрузки,
+	// запуск тестов, external calls и т.д.
+	time.Sleep(500 * time.Millisecond)
+	return nil
+}
 
 func main() {
 	config := utils.Config{}
@@ -45,6 +56,17 @@ func main() {
 	loadJobRepo := postgres.NewLoadRepository(dbpool)
 	httpLoadRepo := postgres.NewHttpLoadRepository(dbpool)
 
+	registry := generators.NewRegistry()
+	registry.Register(&generators.ConstantHttp{})
+
+	sch := scheduler.New(
+		loadJobRepo,
+		registry,
+		1*time.Second,
+		3,
+	)
+	sch.Start(ctx)
+
 	jwtManager := security.NewJWTManager(config.JwtKey, config.JwtRefreshKey, config.AppName, 300)
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(userRepo, jwtRepo, *jwtManager)
@@ -65,7 +87,5 @@ func main() {
 			log.Fatalf("cant create root user: %s", err)
 		}
 	}
-
 	log.Fatal(r.Run(":8080"))
-
 }
