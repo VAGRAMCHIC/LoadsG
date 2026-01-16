@@ -20,6 +20,7 @@ var DB_TABLE_LOAD_JOB = DB_TABLE{
 		"type":       "TEXT NOT NULL",
 		"status":     "TEXT NOT NULL DEFAULT 'pending'",
 		"start_time": "TIMESTAMPTZ",
+		"locked_at":  "TIMESTAMPTZ",
 	},
 	InlinePrimaryKey: true,
 }

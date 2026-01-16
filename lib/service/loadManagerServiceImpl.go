@@ -27,10 +27,6 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 		log.Printf("cant read date: %s", err)
 	}
 	rps, err := strconv.Atoi(req.RPS)
-	duration, err := strconv.ParseFloat(req.Duration, 32)
-	if err != nil {
-		log.Printf("cant read request count: %s", err)
-	}
 
 	loadJob := &model.LoadJob{
 		JobName:   req.JobName,
@@ -45,9 +41,12 @@ func (s *loadManagerService) CreateFixedHTTPLoadJob(ctx context.Context,
 
 	fixedHttpload := &model.FixedHttpLoad{
 		LoadJobId: lj.Id,
-		Payload:   req.Payload,
+		URL:       req.URL,
+		Method:    req.Method,
+		Headers:   req.Headers,
+		Body:      req.Body,
 		RPS:       rps,
-		Duration:  float32(duration),
+		Duration:  req.Duration,
 	}
 	hl, err := s.hrepo.CreateFixed(ctx, fixedHttpload)
 	if err != nil {
@@ -124,9 +123,13 @@ func (s *loadManagerService) CreateRampUpHTTPLoadJob(ctx context.Context,
 
 	rampUpHttpload := &model.RampUpHttpLoad{
 		LoadJobId: lj.Id,
-		Payload:   req.Payload,
+		URL:       req.URL,
+		Method:    req.Method,
+		Headers:   req.Headers,
+		Body:      req.Body,
 		RPS_S:     rps_s,
 		RPS_F:     rps_f,
+		Duration:  req.Duration,
 	}
 	hl, err := s.hrepo.CreateRampUp(ctx, rampUpHttpload)
 	if err != nil {

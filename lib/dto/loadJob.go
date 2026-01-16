@@ -7,8 +7,11 @@ type CreateFixedHTTPLoadRequest struct {
 	Type      string            `json:"type" binding:"required"`
 	StartTime string            `json:"start_time" binding:"required"`
 	RPS       string            `json:"rps" binding:"required"`
-	Duration  string            `json:"duration" binding:"required"`
-	Payload   map[string]string `json:"payload" binding:"required"`
+	Duration  float32           `json:"duration" binding:"required"`
+	URL       string            `json:"url" binding:"required"`
+	Method    string            `json:"method" binding:"required"`
+	Headers   map[string]string `json:"headers"`
+	Body      json.RawMessage   `json:"body"`
 }
 
 type CreateFixedHTTPLoadResponse struct {
@@ -36,8 +39,11 @@ type CreateRampUpHTTPLoadRequest struct {
 	StartTime string            `json:"start_time" binding:"required"`
 	RPS_S     string            `json:"rps_s" binding:"required"`
 	RPS_F     string            `json:"rps_f" binding:"required"`
-	Duration  string            `json:"duration" binding:"required"`
-	Payload   map[string]string `json:"payload" binding:"required"`
+	Duration  float32           `json:"duration" binding:"required"`
+	URL       string            `json:"url" binding:"required"`
+	Method    string            `json:"method" binding:"required"`
+	Headers   map[string]string `json:"headers"`
+	Body      json.RawMessage   `json:"body"`
 }
 
 type CreateRampUpHTTPLoadResponse struct {
