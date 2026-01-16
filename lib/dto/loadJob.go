@@ -1,5 +1,7 @@
 package dto
 
+import "encoding/json"
+
 type CreateFixedHTTPLoadRequest struct {
 	JobName   string            `json:"job_name" binding:"required"`
 	Type      string            `json:"type" binding:"required"`
@@ -17,8 +19,11 @@ type CreateConstantHTTPLoadRequest struct {
 	JobName   string            `json:"job_name" binding:"required"`
 	Type      string            `json:"type" binding:"required"`
 	StartTime string            `json:"start_time" binding:"required"`
-	Count     string            `json:"count" binding:"required"`
-	Payload   map[string]string `json:"payload" binding:"required"`
+	Count     int               `json:"count" binding:"required"`
+	URL       string            `json:"url" binding:"required"`
+	Method    string            `json:"method" binding:"required"`
+	Headers   map[string]string `json:"headers"`
+	Body      json.RawMessage   `json:"body"`
 }
 
 type CreateConstantHTTPLoadResponse struct {

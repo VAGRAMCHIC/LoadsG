@@ -21,7 +21,8 @@ func NewLoadRepository(db *pgxpool.Pool) repository.LoadRepository {
 
 func (r *LoadRepository) GetById(ctx context.Context, id string) (*model.LoadJob, error) {
 	var loadJob model.LoadJob
-	err := r.db.QueryRow(ctx, "SELECT id, job_name, type, start_time, status FROM load_job where id=$1", id).Scan(&loadJob.Id, &loadJob.JobName, &loadJob.Type, &loadJob.StartTime, &loadJob.Status)
+	err := r.db.QueryRow(ctx, "SELECT id, job_name, type, start_time, status FROM load_job where id=$1", id).
+		Scan(&loadJob.Id, &loadJob.JobName, &loadJob.Type, &loadJob.StartTime, &loadJob.Status)
 	if err != nil {
 		log.Printf("cant get load job by id: %s", err)
 		return &loadJob, err
@@ -30,7 +31,9 @@ func (r *LoadRepository) GetById(ctx context.Context, id string) (*model.LoadJob
 }
 
 func (r *LoadRepository) Create(ctx context.Context, loadJob *model.LoadJob) (*model.LoadJob, error) {
-	err := r.db.QueryRow(ctx, "INSERT INTO load_job (job_name, type, start_time) VALUES ($1, $2, $3) RETURNING id, job_name, type, start_time", loadJob.JobName, loadJob.Type, loadJob.StartTime).Scan(&loadJob.Id, &loadJob.JobName, &loadJob.Type, &loadJob.StartTime)
+	err := r.db.QueryRow(ctx, "INSERT INTO load_job (job_name, type, start_time) VALUES ($1, $2, $3) RETURNING id, job_name, type, start_time",
+		loadJob.JobName, loadJob.Type, loadJob.StartTime).
+		Scan(&loadJob.Id, &loadJob.JobName, &loadJob.Type, &loadJob.StartTime)
 	if err != nil {
 		log.Printf("cant create load job: %s", err)
 		return loadJob, err

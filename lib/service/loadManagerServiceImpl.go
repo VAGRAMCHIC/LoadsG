@@ -65,10 +65,10 @@ func (s *loadManagerService) CreateConstantHTTPLoadJob(ctx context.Context,
 	if err != nil {
 		log.Printf("cant read date: %s", err)
 	}
-	count, err := strconv.Atoi(req.Count)
-	if err != nil {
-		log.Printf("cant read request count: %s", err)
-	}
+	//count, err := strconv.Atoi(req.Count)
+	//if err != nil {
+	//	log.Printf("cant read request count: %s", err)
+	//}
 
 	loadJob := &model.LoadJob{
 		JobName:   req.JobName,
@@ -83,8 +83,11 @@ func (s *loadManagerService) CreateConstantHTTPLoadJob(ctx context.Context,
 
 	constantHttpload := &model.ConstantHttpLoad{
 		LoadJobId: lj.Id,
-		Payload:   req.Payload,
-		Count:     count,
+		Count:     req.Count,
+		URL:       req.URL,
+		Method:    req.Method,
+		Headers:   req.Headers,
+		Body:      req.Body,
 	}
 	hl, err := s.hrepo.CreateConstant(ctx, constantHttpload)
 	if err != nil {

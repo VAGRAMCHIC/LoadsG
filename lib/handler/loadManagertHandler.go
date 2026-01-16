@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 
 	"loadsg/lib/dto"
@@ -18,6 +20,8 @@ func NewLoadManagerHandler(s service.LoadManagerService) *LoadManagerHandler {
 func (h *LoadManagerHandler) CreateFixedHttp(c *gin.Context) {
 	var req dto.CreateFixedHTTPLoadRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("cant read json: %s", err)
+
 		c.AbortWithStatus(400)
 		return
 	}
@@ -38,6 +42,7 @@ func (h *LoadManagerHandler) CreateFixedHttp(c *gin.Context) {
 func (h *LoadManagerHandler) CreateConstantHttp(c *gin.Context) {
 	var req dto.CreateConstantHTTPLoadRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("cant read json: %s", err)
 		c.AbortWithStatus(400)
 		return
 	}
@@ -47,6 +52,8 @@ func (h *LoadManagerHandler) CreateConstantHttp(c *gin.Context) {
 		req,
 	)
 	if err != nil {
+		log.Printf("cant create constant Http load: %s", err)
+
 		c.AbortWithStatus(500)
 		return
 	}
