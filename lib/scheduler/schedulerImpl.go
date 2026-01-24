@@ -76,7 +76,3 @@ func (s *scheduler) ProcessPendingEvents(ctx context.Context) error {
 	}
 	return nil
 }
-
-func (s *scheduler) ProcessRunningEvents(ctx context.Context) error {
-
-}

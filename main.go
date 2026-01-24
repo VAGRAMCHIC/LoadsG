@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"loadsg/lib"
 	"loadsg/lib/dto"
-	"loadsg/lib/generators"
 	"loadsg/lib/handler"
 	"loadsg/lib/repository/postgres"
 	"loadsg/lib/router"
@@ -45,9 +44,6 @@ func main() {
 	jwtRepo := postgres.NewJWTRefreshRepository(dbpool)
 	loadJobRepo := postgres.NewLoadRepository(dbpool)
 	httpLoadRepo := postgres.NewHttpLoadRepository(dbpool)
-
-	registry := generators.NewRegistry()
-	registry.Register(&generators.FakeHttpLoad{})
 
 	jwtManager := security.NewJWTManager(config.JwtKey, config.JwtRefreshKey, config.AppName, 300)
 	userService := service.NewUserService(userRepo)
