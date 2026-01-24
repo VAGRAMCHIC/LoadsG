@@ -19,5 +19,9 @@ type HttpLoadRepository interface {
 
 	GetRampUpById(ctx context.Context, id string) (*model.RampUpHttpLoad, error)
 	CreateRampUp(ctx context.Context, httpLoad *model.RampUpHttpLoad) (*model.RampUpHttpLoad, error)
+
+	GetFakeById(ctx context.Context, id string) (*model.FakeHttpLoad, error)
+	CreateFake(ctx context.Context, httpLoad *model.FakeHttpLoad) (*model.FakeHttpLoad, error)
+
 	DeleteRampUp(ctx context.Context, id string) error
 }

@@ -82,6 +82,26 @@ func (h *LoadManagerHandler) CreateRampUpHttp(c *gin.Context) {
 	})
 }
 
+func (h *LoadManagerHandler) CreateFakeHttp(c *gin.Context) {
+	var req dto.CreateFakeHTTPLoadRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.AbortWithStatus(400)
+		return
+	}
+
+	loadJob, err := h.service.CreateFakeHTTPLoadJob(
+		c.Request.Context(),
+		req,
+	)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	c.JSON(200, gin.H{
+		"job_id": loadJob.Id,
+	})
+}
+
 func (h *LoadManagerHandler) DeleteLoadJob(c *gin.Context) {
 	Id := c.Param("id")
 	if Id == "" {

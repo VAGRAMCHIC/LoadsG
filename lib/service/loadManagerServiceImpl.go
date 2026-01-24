@@ -140,6 +140,38 @@ func (s *loadManagerService) CreateRampUpHTTPLoadJob(ctx context.Context,
 	return lj, nil
 }
 
+func (s *loadManagerService) CreateFakeHTTPLoadJob(ctx context.Context,
+	req dto.CreateFakeHTTPLoadRequest) (*model.LoadJob, error) {
+
+	startTime, err := time.Parse(time.RFC3339, req.StartTime)
+	if err != nil {
+		log.Printf("cant read date: %s", err)
+	}
+
+	loadJob := &model.LoadJob{
+		JobName:   req.JobName,
+		Type:      req.Type,
+		StartTime: startTime,
+	}
+
+	lj, err := s.lrepo.Create(ctx, loadJob)
+	if err != nil {
+		log.Printf("cant create loadJob: %s", err)
+	}
+
+	fakeHttpload := &model.FakeHttpLoad{
+		LoadJobId: lj.Id,
+		Duration:  req.Duration,
+	}
+	hl, err := s.hrepo.CreateFake(ctx, fakeHttpload)
+	if err != nil {
+		log.Printf("cant create http load: %s", err)
+		log.Print(hl)
+		return lj, err
+	}
+	return lj, nil
+}
+
 func (s *loadManagerService) DeleteLoadJob(ctx context.Context, loadJobId string) (string, error) {
 	log.Printf("load job id: %s", loadJobId)
 

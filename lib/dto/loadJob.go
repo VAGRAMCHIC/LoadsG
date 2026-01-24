@@ -50,6 +50,17 @@ type CreateRampUpHTTPLoadResponse struct {
 	JobID string `json:"id" binding:"required"`
 }
 
+type CreateFakeHTTPLoadRequest struct {
+	JobName   string  `json:"job_name" binding:"required"`
+	Type      string  `json:"type" binding:"required"`
+	StartTime string  `json:"start_time" binding:"required"`
+	Duration  float32 `json:"duration" binding:"required"`
+}
+
+type CreateFakeHTTPLoadResponse struct {
+	JobID string `json:"id" binding:"required"`
+}
+
 type DeleteLoadJobRequest struct {
 	JobID string `json:"id" binding:"required"`
 }

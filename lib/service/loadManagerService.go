@@ -12,5 +12,8 @@ type LoadManagerService interface {
 	CreateConstantHTTPLoadJob(ctx context.Context, loadJob dto.CreateConstantHTTPLoadRequest) (job *model.LoadJob, err error)
 
 	CreateRampUpHTTPLoadJob(ctx context.Context, loadJob dto.CreateRampUpHTTPLoadRequest) (job *model.LoadJob, err error)
+
+	CreateFakeHTTPLoadJob(ctx context.Context, loadJob dto.CreateFakeHTTPLoadRequest) (job *model.LoadJob, err error)
+
 	DeleteLoadJob(ctx context.Context, loadJobId string) (id string, err error)
 }

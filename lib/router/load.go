@@ -27,4 +27,7 @@ func registerLoadManagerPrivate(
 
 	lF.POST("/ramp-up", h.Load.CreateRampUpHttp)
 	lF.DELETE("/ramp-up/:id", h.Load.DeleteLoadJob)
+
+	lF.POST("/fake", h.Load.CreateFakeHttp)
+	lF.DELETE("/fake/:id", h.Load.DeleteLoadJob)
 }
