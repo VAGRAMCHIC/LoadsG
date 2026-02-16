@@ -8,6 +8,7 @@ import (
 	"loadsg/lib/handler"
 	"loadsg/lib/repository/postgres"
 	"loadsg/lib/router"
+	"loadsg/lib/scheduler"
 	"loadsg/lib/security"
 	"loadsg/lib/service"
 	"loadsg/utils"
@@ -65,5 +66,10 @@ func main() {
 			log.Fatalf("cant create root user: %s", err)
 		}
 	}
+
+	registry := scheduler.NewEventRegistry()
+	eR := scheduler.TestEvent{}
+	registry.Register(&eR)
+
 	log.Fatal(r.Run(":8080"))
 }

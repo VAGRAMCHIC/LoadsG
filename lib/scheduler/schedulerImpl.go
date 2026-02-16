@@ -12,7 +12,7 @@ type scheduler struct {
 	eventRepo   repository.EventRepository
 }
 
-func NewScheduler(lr repository.LoadRepository, ev repository.EventRepository) *scheduler {
+func NewScheduler(lr repository.LoadRepository, ev repository.EventRepository) Scheduler {
 	return &scheduler{loadJobRepo: lr, eventRepo: ev}
 }
 
@@ -47,7 +47,7 @@ func (s *scheduler) Create(ctx context.Context) (event_ids []string, err error) 
 	return event_ids, err
 }
 
-func (s *scheduler) ProcessPendingEvents(ctx context.Context) error {
+func (s *scheduler) RunEvents(ctx context.Context) error {
 	// 1. Получаем ближайшие load_jobs
 	loadJobs, err := s.loadJobRepo.ScanClosestLJob(ctx)
 	if err != nil {
