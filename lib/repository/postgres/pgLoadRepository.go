@@ -99,7 +99,7 @@ func (r *LoadRepository) Delete(ctx context.Context, id string) error {
 
 func (r *LoadRepository) ScanLJob(ctx context.Context) ([]model.LoadJob, error) {
 	const query = `
-	SELECT id, job_name, type, strart_time
+	SELECT id, job_name, type, start_time
 	FROM load_job`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -129,7 +129,7 @@ func (r *LoadRepository) ScanLJob(ctx context.Context) ([]model.LoadJob, error) 
 
 func (r *LoadRepository) ScanClosestLJob(ctx context.Context) ([]model.LoadJob, error) {
 	const query = `
-	SELECT id, job_name, type, strart_time
+	SELECT id, job_name, type, start_time
 	FROM load_job
 	WHERE start_time >= NOW() - INTERVAL '10 seconds'`
 	rows, err := r.db.Query(ctx, query)

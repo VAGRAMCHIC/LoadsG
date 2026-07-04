@@ -22,7 +22,7 @@ func NewJWTRefreshRepository(db *pgxpool.Pool) repository.JWTRefreshRepository {
 
 func (r *JWTRefreshRepository) GetByJWTHash(ctx context.Context, hash string) (*model.JWTRefreshToken, error) {
 	var token model.JWTRefreshToken
-	err := r.db.QueryRow(context.Background(), "SELECT id, user_uid, token_hash, expires_at FROM refresh_tokens where token_hash=$1", hash).Scan(&token.Id, &token.UserUid, &token.TokenHash, &token.ExpiresAt)
+	err := r.db.QueryRow(ctx, "SELECT id, user_uid, token_hash, expires_at FROM refresh_tokens where token_hash=$1", hash).Scan(&token.Id, &token.UserUid, &token.TokenHash, &token.ExpiresAt)
 	if err != nil {
 		log.Printf("cant get refresh token by hash: %s", err)
 		return &token, err
@@ -32,7 +32,7 @@ func (r *JWTRefreshRepository) GetByJWTHash(ctx context.Context, hash string) (*
 }
 
 func (r *JWTRefreshRepository) Create(ctx context.Context, jwt *model.JWTRefreshToken) (*model.JWTRefreshToken, error) {
-	err := r.db.QueryRow(context.Background(),
+	err := r.db.QueryRow(ctx,
 		"INSERT INTO refresh_tokens (user_uid, token_hash, expires_at) VALUES ($1, $2, $3) RETURNING user_uid, token_hash, expires_at", jwt.UserUid, jwt.TokenHash, jwt.ExpiresAt).Scan(&jwt.UserUid, &jwt.TokenHash, &jwt.ExpiresAt)
 	if err != nil {
 		log.Fatalf("Insert data error: %s", err)
@@ -60,7 +60,7 @@ func (r *JWTRefreshRepository) Get(ctx context.Context, hash string) (string, er
 }
 
 func (r *JWTRefreshRepository) Delete(ctx context.Context, jwtHash string) error {
-	cmd, err := r.db.Exec(context.Background(),
+	cmd, err := r.db.Exec(ctx,
 		"DELETE FROM refresh_tokens WHERE token_hash=$1", jwtHash)
 	if err != nil {
 		log.Fatalf("Delete data error: %s", err)
