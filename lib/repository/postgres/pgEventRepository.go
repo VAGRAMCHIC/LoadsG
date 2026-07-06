@@ -13,19 +13,23 @@ const (
 	PENDING_E = `
 	SELECT id, load_job_id, status
 	FROM events
-	WHERE status=pending`
+	WHERE status='pending'`
 	RUNNING_E = `
 	SELECT id, load_job_id, status
 	FROM events
-	WHERE status=running`
+	WHERE status='running'`
+	PROCESSING_E = `
+	SELECT id, load_job_id, status
+	FROM events
+	WHERE status='processing'`
 	DONE_E = `
 	SELECT id, load_job_id, status
 	FROM events
-	WHERE status=done`
+	WHERE status='done'`
 	FAILED_E = `
 	SELECT id, load_job_id, status
 	FROM events
-	WHERE status=failed`
+	WHERE status='failed'`
 )
 
 type EventRepository struct {
@@ -107,6 +111,10 @@ func (r *EventRepository) ScanEvents(ctx context.Context, status string) ([]mode
 	case "running":
 		{
 			query = RUNNING_E
+		}
+	case "processing":
+		{
+			query = PROCESSING_E
 		}
 	case "done":
 		{

@@ -29,6 +29,9 @@ func InitDB(ctx context.Context, pool *pgxpool.Pool) error {
 			return err
 		}
 	}
+	if err := ensureEventsID(ctx, pool); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -80,6 +83,26 @@ func initTable(
 	return err
 }
 
+func ensureEventsID(ctx context.Context, pool *pgxpool.Pool) error {
+	_, err := pool.Exec(ctx, `
+		ALTER TABLE events ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+		UPDATE events SET id = gen_random_uuid() WHERE id IS NULL;
+		ALTER TABLE events ALTER COLUMN id SET NOT NULL;
+		DO $$
+		BEGIN
+			IF NOT EXISTS (
+				SELECT 1
+				FROM pg_constraint
+				WHERE conrelid = 'events'::regclass
+				  AND contype = 'p'
+			) THEN
+				ALTER TABLE events ADD PRIMARY KEY (id);
+			END IF;
+		END $$;
+	`)
+	return err
+}
+
 func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
@@ -95,30 +118,3 @@ func InitPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 	log.Println("database pool initialized")
 	return pool, nil
 }
-
-// --------------- DB_TABLE_HTTP_LOAD_JOB ------------------
-
-//func InsertHTTPLoadJob(conn *pgx.Conn, loadJob model.HTTPLoadJob) {
-//	_, err := conn.Exec(context.Background(),
-//		"INSERT INTO http_load_job (job_name, duration, type, payload, start_time) VALUES ($1, $2, $3, $4, $5)",
-//													loadJob.JobName, loadJob.Duration, loadJob.Type, loadJob.Payload, loadJob.StartTime)
-//	if err != nil {
-//		log.Fatalf("Insert data error: %s", err.Error())
-//		defer conn.Close(context.Background())
-//	}
-//	defer conn.Close(context.Background())
-//}
-
-//func GetHTTPLoadJob(conn *pgx.Conn, id string) (model.HTTPLoadJob, error) {
-//	var loadJob model.HTTPLoadJob
-//	err := conn.QueryRow(context.Background(), "SELECT * FROM http_load_job where id=$1", id).Scan(&loadJob.JobName, &loadJob.Duration, &loadJob.Type, &loadJob.Payload, &loadJob.StartTime)
-//	if err != nil {
-//		if err == pgx.ErrNoRows {
-//			// load job not found
-//			return loadJob, nil
-//		}
-//		return loadJob, err
-//	}
-//	defer conn.Close(context.Background())
-//	return loadJob, err
-//}

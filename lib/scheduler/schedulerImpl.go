@@ -45,20 +45,10 @@ func (s *scheduler) ScheduleJobs(ctx context.Context) error {
 	}
 
 	for _, job := range jobs {
-		// Проверяем, есть ли уже события для этого load_job_id
-		// Можно сделать запрос, но пока упростим: попробуем создать, если дубликат – ошибка игнорируется.
-		// Лучше сначала проверить существование, но для простоты создадим, если нет.
-		events, err := s.eventRepo.ScanEvents(ctx, "pending")
+		exists, err := s.eventExistsForJob(ctx, job.Id)
 		if err != nil {
-			log.Printf("ScheduleJobs: scan events error: %v", err)
+			log.Printf("ScheduleJobs: scan events for job %s error: %v", job.Id, err)
 			continue
-		}
-		exists := false
-		for _, e := range events {
-			if e.LoadJobId == job.Id {
-				exists = true
-				break
-			}
 		}
 		if !exists {
 			// Создаём событие со статусом pending
@@ -73,6 +63,21 @@ func (s *scheduler) ScheduleJobs(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (s *scheduler) eventExistsForJob(ctx context.Context, jobID string) (bool, error) {
+	for _, status := range []string{"pending", "running", "processing", "done", "failed"} {
+		events, err := s.eventRepo.ScanEvents(ctx, status)
+		if err != nil {
+			return false, err
+		}
+		for _, e := range events {
+			if e.LoadJobId == jobID {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 // ProcessPending – ищем задания, чьё время старта <= now, и переводим их события в running.
@@ -118,6 +123,12 @@ func (s *scheduler) ExecuteRunning(ctx context.Context) error {
 	}
 
 	for _, ev := range events {
+		ev.Status = "processing"
+		if err := s.eventRepo.UpdateEvent(ctx, &ev); err != nil {
+			log.Printf("ExecuteRunning: failed to claim event %s: %v", ev.Id, err)
+			continue
+		}
+
 		// Загружаем задание
 		loadJob, err := s.loadRepo.GetById(ctx, ev.LoadJobId)
 		if err != nil {

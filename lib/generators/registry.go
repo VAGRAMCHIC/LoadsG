@@ -16,6 +16,10 @@ func (r *Registry) Register(a Generator) {
 	r.generators[a.Name()] = a
 }
 
+func (r *Registry) RegisterName(name string, a Generator) {
+	r.generators[name] = a
+}
+
 func (r *Registry) Get(name string) (Generator, error) {
 	a, ok := r.generators[name]
 	if !ok {

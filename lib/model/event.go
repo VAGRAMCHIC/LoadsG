@@ -9,6 +9,7 @@ type Event struct {
 var DB_TABLE_EVENTS = DB_TABLE{
 	Name: "events",
 	Params: map[string]string{
+		"id":          "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
 		"status":      "TEXT NOT NULL DEFAULT 'pending'",
 		"load_job_id": "UUID NOT NULL",
 	},
