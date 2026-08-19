@@ -52,9 +52,9 @@ func main() {
 	// Регистрируем генераторы
 	registry := generators.NewRegistry()
 	registry.Register(&generators.FakeHttpLoad{})
-	constantGenerator := &generators.ConstantHttp{}
-	registry.Register(constantGenerator)
-	registry.RegisterName("constant_http", constantGenerator)
+	constantGenerator := generators.NewConstantHttp(httpLoadRepo)
+    registry.Register(constantGenerator)
+    registry.RegisterName("constant_http", constantGenerator)
 	rampUpGenerator := generators.NewRampUpHttp(httpLoadRepo)
 	registry.Register(rampUpGenerator)
 	registry.RegisterName("ramp_up_http_load", rampUpGenerator)
@@ -126,3 +126,4 @@ func main() {
 	time.Sleep(2 * time.Second)
 	log.Println("Server stopped")
 }
+
