@@ -33,6 +33,23 @@
 *.app
 app
 
+# .dockerignore
+
+.git
+.github
+.vscode
+.idea
+
+*.log
+
+tmp
+dist
+bin
+
+.env
+.env.*
+
+
 #Project
 docker-compose.test.yaml
 run_build.sh
