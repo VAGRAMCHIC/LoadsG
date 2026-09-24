@@ -12,6 +12,7 @@ import (
 	"loadsg/lib/scheduler"
 	"loadsg/lib/security"
 	"loadsg/lib/service"
+	"loadsg/lib/report"
 	"loadsg/utils"
 	"log"
 	"os"
@@ -49,12 +50,19 @@ func main() {
 	httpLoadRepo := postgres.NewHttpLoadRepository(dbpool)
 	eventRepo := postgres.NewEventRepository(dbpool)
 
+
+	reportCfg := report.Config{
+	Enabled: config.ReportEnabled,
+	Format:  config.ReportFormat,
+	Dir:     config.ReportDir,
+}
+
 	// Регистрируем генераторы
 	registry := generators.NewRegistry()
 	registry.Register(&generators.FakeHttpLoad{})
-	constantGenerator := generators.NewConstantHttp(httpLoadRepo)
-    registry.Register(constantGenerator)
-    registry.RegisterName("constant_http", constantGenerator)
+	constantGenerator := generators.NewConstantHttp(httpLoadRepo, reportCfg)
+	registry.Register(constantGenerator)
+	registry.RegisterName("constant_http", constantGenerator)
 	rampUpGenerator := generators.NewRampUpHttp(httpLoadRepo)
 	registry.Register(rampUpGenerator)
 	registry.RegisterName("ramp_up_http_load", rampUpGenerator)

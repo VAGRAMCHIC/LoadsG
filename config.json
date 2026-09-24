@@ -1,5 +1,6 @@
 {
   "id": "test_id",
+  "id_dd": "test_ddid",
   "key": "test_key",
   "jwtKey": "OoGael1eiVeighoo3eighoh9ze8mewosvveER",
   "maxConcurrent": 10,

@@ -1,23 +1,38 @@
-FROM golang:1.25.3-alpine AS build
+FROM golang:1.26.5-alpine AS builder
 
 RUN apk add --no-cache git
+
 WORKDIR /app
 
-RUN go mod init loadsg
-RUN go mod tidy
-RUN go get github.com/gin-gonic/gin
-RUN go get github.com/golang-jwt/jwt/v5
-RUN go get github.com/jackc/pgx/v5
-RUN go get github.com/jackc/pgx/v5/pgxpool@v5.7.6
+COPY go.mod go.sum ./
+
+RUN go mod download
+
 COPY . .
 
-RUN go build -o app .
+RUN CGO_ENABLED=0 go build \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /out/loadsg \
+    ./cmd/server
+
+RUN CGO_ENABLED=0 go build \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /out/loadsg-cli \
+    ./cmd/loadsg
 
 
-FROM alpine:latest
+FROM alpine:3.22
+
 RUN apk add --no-cache ca-certificates
-WORKDIR /root/
-COPY --from=build /app/app .
-COPY config.json /app/
+
+WORKDIR /app
+
+COPY --from=builder /out/loadsg ./loadsg
+COPY --from=builder /out/loadsg-cli ./loadsg-cli
+COPY config.json ./config.json
+
 EXPOSE 8080
-CMD ["./app"]
+
+ENTRYPOINT ["./loadsg"]

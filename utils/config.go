@@ -16,6 +16,10 @@ type Config struct {
 	AppName       string `json:"appName"`
 	MaxConcurrent int    `json:"MaxConcurrent"`
 	PgConn        string `json:"pgConn"`
+
+	ReportEnabled bool   `json:"reportEnabled"` 
+	ReportFormat  string `json:"reportFormat"`  
+	ReportDir     string `json:"reportDir"`
 }
 
 func ReadOSENV() (Config, error) {
@@ -27,6 +31,10 @@ func ReadOSENV() (Config, error) {
 	config.AppName = os.Getenv("APP_NAME")
 	config.MaxConcurrent, _ = strconv.Atoi(os.Getenv("MAX_CONCURRENT"))
 	config.PgConn = os.Getenv("PG_CONN")
+
+	config.ReportEnabled = os.Getenv("REPORT_ENABLED") != "false"
+	config.ReportFormat = envOr("REPORT_FORMAT", "json")
+	config.ReportDir = os.Getenv("REPORT_DIR") 
 	if config.JwtKey == "" || config.PgConn == "" || config.RootToken == "" {
 		return config, errors.New("cant read config envs")
 	}
@@ -48,4 +56,11 @@ func ReadConfig(filename string) (Config, error) {
 	}
 
 	return config, nil
+}
+
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }
